@@ -1,7 +1,7 @@
 const pool = require('../../connection/db')
 const uuid = require('uuid')
 const result = uuid.v4()
-console.log(result)
+
 const getProfile = (req, res) => {
     pool.query(
         `select id,firstName,lastName,phone,email from wca_info`,

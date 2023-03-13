@@ -42,7 +42,6 @@ const createuser = async (req, res) => {
 
   try {
     Object.assign(req.body,{id:id})
-    console.log(req.body);
     const keys = Object.keys(req.body);
     const values = Object.values(req.body);
     const sql = `INSERT INTO wca_info (${keys}) VALUES (?)`;

@@ -23,15 +23,15 @@ const login = async (req, res) => {
   const emailID = req.body.email;
   await pool.query(sql, [emailID], async (err, result) => {
     if (err) {
-      await res.status(500).json({
+       res.status(500).json({
         status: false,
         message: "Unable to login your account",
         // errors: err.sqlMessage
       });
     }
-    
+    console.log("resut",result)
     if (result.length === 0) {
-      await res.status(400).json({
+     res.status(400).json({
         status: false,
         message: "Email address don't exits, please create account first",
       });
@@ -48,7 +48,7 @@ const login = async (req, res) => {
           {
             id: userMatch.id
           },
-          process.env.TOKEN_SECRET,
+          process.env.TOKEN_SECRET_KEY,
           { expiresIn: "1d" }
         );
         res.header("auth-token", token).json({

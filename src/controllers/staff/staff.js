@@ -49,7 +49,7 @@ const creatingStaff = async (req,res) => {
 }
 
 const getStaffList = async (req,res) => {
-    console.log("body",req.body);
+    // console.log("body",req.body);
    const sql = `SELECT * FROM wca_staff`;
    await pool.query(sql, (err, result) => {
     if (err) {
