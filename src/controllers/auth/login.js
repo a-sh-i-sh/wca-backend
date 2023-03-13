@@ -29,7 +29,7 @@ const login = async (req, res) => {
         // errors: err.sqlMessage
       });
     }
-    console.log(result.length)
+    
     if (result.length === 0) {
       await res.status(400).json({
         status: false,
@@ -46,19 +46,15 @@ const login = async (req, res) => {
         // Create and assign new token
         const token = jwt.sign(
           {
-            // _id: userMatch._id,
-            name: `${userMatch.firstName} ${userMatch.lastName}`,
-            email: userMatch.email,
-            // role: userMatch.role,
+            id: userMatch.id
           },
           process.env.TOKEN_SECRET,
           { expiresIn: "1d" }
         );
         res.header("auth-token", token).json({
           status: true,
-          user: `${userMatch.firstName} ${userMatch.lastName}`,
-          //   role: userMatch.role,
           message: `Login successfully`,
+          userID: "",
           token: token,
           
         });
