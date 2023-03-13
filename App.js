@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const pool = require('./src/connection/db')
-// const routes = require('./src/routes')
+const routes = require('./src/routes/admin/index')
 
 const PORT = 5000;
 const app = express();
@@ -18,7 +18,9 @@ app.use(express.urlencoded({ extended: false }));
 app.get("/", (req, res) => {
     res.send("Welcome to WCA Application!!!");
   });
-  
+
+
+  app.use("/admin", routes);
 
 // Create server
   app.listen(PORT, () => {

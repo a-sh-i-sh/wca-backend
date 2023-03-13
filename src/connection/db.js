@@ -2,7 +2,7 @@ const { createPool,createConnection } = require("mysql")
 
 const dbConnectionInfo = {
     host: "127.0.0.1",
-    port: "3306",
+    port: "3307",
     user: "root",
     password: "",
     connectionLimit: 10, //mysql connection pool length
@@ -26,7 +26,7 @@ const dbConnectionInfo = {
       if (!err) {
           console.log("Database is connected ... ");
       } else {
-          console.log("Error connecting database ... ");
+          console.log("Error connecting database ... ,",err);
       }
   }); 
   
