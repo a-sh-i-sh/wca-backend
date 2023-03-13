@@ -19,9 +19,10 @@ app.use(helmet());
 
 // Load Routing
 app.use("/api",web);
-// app.get("/", (req, res) => {
-//     res.send("Welcome to WCA Application!!!");
-//   });
+
+app.get("/", (req, res) => {
+    res.send("Welcome to WCA Application!!!");
+  });
   
 
 // Create server
