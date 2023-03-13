@@ -1,6 +1,7 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const uuid = require('uuid')
 const pool = require("../../connection/db");
 const {
   loginValidation,
@@ -55,6 +56,7 @@ const login = async (req, res) => {
           message: `Login successfully`,
           userID: "",
           token: token,
+          
         });
       } else {
         res.status(401).json({

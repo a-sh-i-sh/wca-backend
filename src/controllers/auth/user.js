@@ -1,8 +1,9 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const pool = require("../../connection/db");
+const uuid = require('uuid')
 const { registerValidation } = require("../../validators/auth");
-
+// const uniqueidentifier = NEWID()
 const createuser = async (req, res) => {
   delete req.body.confirm_password;
 
@@ -37,8 +38,11 @@ const createuser = async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashPassword = await bcrypt.hash(req.body.password, salt);
   req.body.password = hashPassword;
+  const id = uuid.v4()
 
   try {
+    Object.assign(req.body,{id:id})
+    console.log(req.body);
     const keys = Object.keys(req.body);
     const values = Object.values(req.body);
     const sql = `INSERT INTO wca_info (${keys}) VALUES (?)`;
