@@ -16,7 +16,7 @@ const createuser = async (req, res) => {
   }
 
   // duplicate email address error
-  const sql = "SELECT * FROM wca_info WHERE email = ?";
+  const sql = "SELECT * FROM wca_users WHERE email = ?";
   const emailID = req.body.email;
   await pool.query(sql, [emailID], async (err, result) => {
     if (err) {
@@ -44,7 +44,7 @@ const createuser = async (req, res) => {
     Object.assign(req.body,{id:id})
     const keys = Object.keys(req.body);
     const values = Object.values(req.body);
-    const sql = `INSERT INTO wca_info (${keys}) VALUES (?)`;
+    const sql = `INSERT INTO wca_users (${keys}) VALUES (?)`;
     await pool.query(sql, [values], (err, result) => {
       if (err) {
         console.log(err);

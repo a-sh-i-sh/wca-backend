@@ -9,10 +9,9 @@ const TokenVerify = require("../middlewares/TokenVerify");
 router.post("/auth/createuser", createuser);
 router.post("/auth/login", login);
 
-router.post("/profile", TokenVerify,getProfile);
-router.post("/update/profile", TokenVerify,updateUser);
-router.post("/staff/create", TokenVerify,creatingStaff);
-router.post("/staff/list", TokenVerify,getStaffList);
-
+router.post("/profile", TokenVerify, getProfile);
+router.post("/update/profile", TokenVerify, updateUser);
+router.post("/staff/create", TokenVerify, creatingStaff);
+router.post("/staff/list", TokenVerify, getStaffList);
 
 module.exports = router;

@@ -4,7 +4,7 @@ const result = uuid.v4()
 
 const getProfile = (req, res) => {
     pool.query(
-        `select id,firstName,lastName,phone,email from wca_info`,
+        `select id,firstName,lastName,phone,email from wca_users`,
         [],
         (error, results, fields) => {
           if (error) {
@@ -22,7 +22,7 @@ const getProfile = (req, res) => {
   }
    const updateUser =  async (req, res)  => {
     
-    const sql = "update wca_info set firstName=?, lastName=?, phone=?, email=?, password=? where id = ?";
+    const sql = "update wca_users set firstName=?, lastName=?, phone=?, email=?, password=? where id = ?";
     await pool.query(sql, [
       req.body.first_name,
       req.body.last_name,

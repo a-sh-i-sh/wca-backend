@@ -19,7 +19,7 @@ const login = async (req, res) => {
   }
 
   // Searching user detail for matching credential
-  const sql = "SELECT * FROM wca_info WHERE email = ?";
+  const sql = "SELECT * FROM wca_users WHERE email = ?";
   const emailID = req.body.email;
   await pool.query(sql, [emailID], async (err, result) => {
     if (err) {
