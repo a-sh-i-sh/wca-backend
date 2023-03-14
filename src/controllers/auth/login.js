@@ -29,9 +29,9 @@ const login = async (req, res) => {
         // errors: err.sqlMessage
       });
     }
-    
+    console.log("resut",result)
     if (result?.length === 0) {
-      await res.status(400).json({
+     res.status(400).json({
         status: false,
         message: "Email address don't exits, please create account first",
       });

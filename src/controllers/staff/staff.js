@@ -22,7 +22,7 @@ const creatingStaff = async (req, res) => {
       const hashPassword = await bcrypt.hash(req.body.password, salt);
       req.body.password = hashPassword;
     }
-    const sql = "update wca_staff set firstName=?, lastName=?, phone=?, email=?, type=?, password=? where id = ?";
+    const sql = `update wca_staff set firstName=?,lastName=?,phone=?,email=?,type=?,password=? where id = ?`;
     await pool.query(sql, [
       req.body.first_name,
       req.body.last_name,
@@ -80,27 +80,68 @@ const creatingStaff = async (req, res) => {
   }
 }
 
-const getStaffList = async (req, res) => {
-  console.log("body", req.body);
+const getAll = new Promise((resolve, reject) => {
   const sql = `SELECT * FROM wca_staff`;
-  await pool.query(sql, (err, result) => {
+  pool.query(sql, (err, result) => {
     if (err) {
       console.log(err);
-      return res.status(500).json({
-        status: false,
-        message: "Unable to fetch Staff List",
-        // errors: err.sqlMessage
-      });
+      reject(err);
     }
-    console.log("record found", result);
-    return res.status(201).json({
-      status: true,
-      message: "Staff List found successfully",
-      staff_list: result,
-    });
+    // console.log("user",result.length)
+    resolve(result.length);
   });
+});
 
-}
+const getStaffList = async (req, res) => {
+  try {
+    console.log("body", req.body);
+    // const page = req.body.page ? Number(req.body.page) : 1;
+    // const limit = req.body.limit ? Number(req.body.limit) : 1;
+    const page = Number(req.body.page);
+    const limit = Number(req.body.limit);
+    const skip = (page - 1) * limit;
+    const sort = req.body.sort;
+    const search = req.body.search;
+
+    const total_records = await getAll;
+    const pages =
+      total_records % limit === 0
+        ? Math.trunc(total_records / limit)
+        : Math.trunc(total_records / limit) + 1;
+
+    const sql = `SELECT * FROM wca_staff WHERE firstName LIKE '%${search}%'
+OR lastName LIKE '%${search}%'
+OR email LIKE '%${search}%'
+OR type LIKE '%${search}%'
+OR phone LIKE '%${search}%'
+LIMIT ${skip},${limit}`;
+    await pool.query(sql, (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({
+          status: false,
+          message: "Unable to fetch Staff List",
+          // errors: err.sqlMessage
+        });
+      }
+      console.log("record found", result);
+      return res.status(201).json({
+        status: true,
+        message: "Staff List found successfully",
+        staff_list: result,
+        page,
+        pages,
+        page_records: result.length,
+        total_records,
+      });
+    });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(400)
+      .json({ status: false, message: "Unable to fetch Staff List" });
+  }
+};
 const getStaffById = (req, res) => {
   pool.query(
     `select id,firstName,lastName,phone,email,type from wca_staff where id = ?`,
