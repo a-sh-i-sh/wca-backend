@@ -19,11 +19,11 @@ const login = async (req, res) => {
   }
 
   // Searching user detail for matching credential
-  const sql = "SELECT * FROM wca_info WHERE email = ?";
+  const sql = "SELECT * FROM wca_users WHERE email = ?";
   const emailID = req.body.email;
   await pool.query(sql, [emailID], async (err, result) => {
     if (err) {
-      await res.status(500).json({
+       res.status(500).json({
         status: false,
         message: "Unable to login your account",
         // errors: err.sqlMessage
@@ -48,7 +48,7 @@ const login = async (req, res) => {
           {
             id: userMatch.id
           },
-          process.env.TOKEN_SECRET,
+          process.env.TOKEN_SECRET_KEY,
           { expiresIn: "1d" }
         );
         res.header("auth-token", token).json({

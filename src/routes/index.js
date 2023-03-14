@@ -4,6 +4,7 @@ const { createuser } = require("../controllers/auth/user");
 const { login } = require("../controllers/auth/login");
 const { creatingStaff, getStaffList,getStaffById,deleteStaffById } = require("../controllers/staff/staff");
 const { getProfile, updateUser } = require("../controllers/profile/profile");
+const TokenVerify = require("../middlewares/TokenVerify");
 
 router.post("/auth/createuser", createuser);
 router.post("/auth/login", login);

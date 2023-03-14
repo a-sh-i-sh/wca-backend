@@ -86,21 +86,13 @@ const getStaffList = async (req, res) => {
   await pool.query(sql, (err, result) => {
     if (err) {
       console.log(err);
-      return res.status(500).json({
-        status: false,
-        message: "Unable to fetch Staff List",
-        // errors: err.sqlMessage
-      });
+                reject(err);
     }
-    console.log("record found", result);
-    return res.status(201).json({
-      status: true,
-      message: "Staff List found successfully",
-      staff_list: result,
-    });
+    // console.log("user",result.length)
+    resolve(result.length);
   });
-
 }
+
 const getStaffById = (req, res) => {
   pool.query(
     `select id,firstName,lastName,phone,email,type from wca_staff where id = ?`,
