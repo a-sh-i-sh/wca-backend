@@ -30,7 +30,7 @@ const login = async (req, res) => {
       });
     }
     console.log("resut",result)
-    if (result.length === 0) {
+    if (result?.length === 0) {
      res.status(400).json({
         status: false,
         message: "Email address don't exits, please create account first",
@@ -54,7 +54,6 @@ const login = async (req, res) => {
         res.header("auth-token", token).json({
           status: true,
           message: `Login successfully`,
-          userID: "",
           token: token,
           
         });
