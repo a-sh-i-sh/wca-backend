@@ -62,10 +62,8 @@ const getAll = new Promise((resolve, reject) => {
 const getStaffList = async (req, res) => {
   try {
     console.log("body", req.body);
-    // const page = req.body.page ? Number(req.body.page) : 1;
-    // const limit = req.body.limit ? Number(req.body.limit) : 1;
-    const page = Number(req.body.page);
-    const limit = Number(req.body.limit);
+    const page = req.body.page ? Number(req.body.page) : 1;
+    const limit = req.body.limit ? Number(req.body.limit) : 5;
     const skip = (page - 1) * limit;
     const sort = req.body.sort;
     const search = req.body.search;
