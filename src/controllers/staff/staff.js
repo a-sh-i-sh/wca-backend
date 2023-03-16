@@ -22,6 +22,7 @@ const creatingStaff = async (req, res) => {
       const hashPassword = await bcrypt.hash(req.body.password, salt);
       req.body.password = hashPassword;
     }
+    console.log(req.body);
     const sql = `update wca_staff set firstName=?,lastName=?,phone=?,email=?,type=?,password=? where id = ?`;
     await pool.query(sql, [
       req.body.first_name,

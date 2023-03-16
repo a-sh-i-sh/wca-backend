@@ -43,27 +43,4 @@ const getProfile = (req, res) => {
             });
     })
   }
-    // pool.query(
-    //   `update registration set firstName=?, lastName=?, phone=?, email=?, password=? where email = ?`,
-    //   [
-    //     data.first_name,
-    //     data.last_name,
-    //     data.phone,
-    //     data.email,
-    //     data.password,
-    //   ],
-    //   (error, results, fields) => {
-    //     if (error) {
-    //       return res.json({
-    //         status: false,
-    //         data: error
-    //       });
-    //     }
-    //     return res.json({
-    //       status: true,
-    //       data: results[0]
-    //     });
-    //   }
-    // );
-  // }
 module.exports = { getProfile ,updateUser};
