@@ -1,21 +1,21 @@
 const { createPool, createConnection } = require("mysql");
 
-const dbConnectionInfo = {
-  host: "127.0.0.1",
-  port: "3307",
-  user: "root",
-  password: "",
-  connectionLimit: 10, //mysql connection pool length
-  database: "wca",
-};
-
 // const dbConnectionInfo = {
-//     host: "localhost",
-//     user: "b4orient_wca",
-//     password: "2B?NV8L.pSHC",
-//     connectionLimit: 10, //mysql connection pool length
-//     database: "b4orient_wca",
-//   };
+//   host: "127.0.0.1",
+//   port: "3306",
+//   user: "root",
+//   password: "",
+//   connectionLimit: 10, //mysql connection pool length
+//   database: "wca",
+// };
+
+const dbConnectionInfo = {
+    host: "localhost",
+    user: "b4orient_wca",
+    password: "2B?NV8L.pSHC",
+    connectionLimit: 10, //mysql connection pool length
+    database: "b4orient_wca",
+  };
 
 
 //create mysql connection pool
