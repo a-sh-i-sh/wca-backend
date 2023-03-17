@@ -7,13 +7,13 @@ const TokenVerify = (req,res,next) => {
         token = token.split(' ')[1];
         jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err,valid) => {
             if(err){
-                res.status(401).json({status: false, messages: ["Your token is expired, please login again"]})
+                res.status(401).json({status: false, messages: "Your token is expired, please login again",errors:["Your token is expired, please login again"]})
             }else{
                 next();
             }
         }) 
     }else{
-        res.status(401).json({status: false, messages: ["Please add token in header"]})
+        res.status(401).json({status: false, messages: "Please add token in header",errors:["Please add token in header"]})
     }
 }
 

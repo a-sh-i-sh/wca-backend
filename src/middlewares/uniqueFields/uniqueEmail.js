@@ -16,12 +16,14 @@ const uniqueEmail = async (req, res, next) => {
       return res.status(500).json({
         status: false,
         message: "Unable to save staff member's details ",
+        errors:["Unable to save staff member's details"]
       });
     }
     if (result.length) {
       return res.status(409).json({
         status: false,
         message: "Email already exists",
+        errors:["Unable to save staff member's details"]
       });
     } else {
       next();
