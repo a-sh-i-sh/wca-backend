@@ -11,7 +11,7 @@ const getProfile = async (req, res) => {
       return res.status(500).json({
         status: false,
         message: "Unable to fetch profile data",
-        data: error,
+        errors: [error],
       });
     }
     if (results.length) {
@@ -19,12 +19,14 @@ const getProfile = async (req, res) => {
         status: true,
         message: "successfully found profile data",
         data: results[0],
+        errors: [],
       });
     } else {
       return res.status(400).json({
         status: false,
         message: "No record found",
         data: results[0],
+        errors: [],
       });
     }
   });
@@ -51,18 +53,21 @@ const updateUser = async (req, res) => {
           return res.status(500).json({
             status: false,
             message: "Unable to update profile",
-          });
+            errors: [err],
+      });
         }
         console.log("if id is wrong don't match",result);
         if (result.affectedRows) {
           return res.status(200).json({
             status: true,
             message: "profile updated successfully",
+            errors: ["Updated Successfully"],
           });
         } else {
           return res.status(400).json({
             status: false,
-            message: "Invalid id for updating profile",
+            message: "Unable to update profile",
+            errors: ["Invalid Id"],
           });
         }
       }
@@ -70,7 +75,8 @@ const updateUser = async (req, res) => {
   } else {
     return res.status(400).json({
       status: false,
-      message: "Invalid id for updating profile",
+      message: "Unable to update profile",
+      errors: ["Invalid Id"],
     });
   }
 };

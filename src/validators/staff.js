@@ -18,7 +18,7 @@ const staffValidation = async (req, res, next) => {
   if (error) {
     return res
       .status(422)
-      .json({ status: false, message: error.details[0].message });
+      .json({ status: false, errors: error.details , message:error.details[0].message });
   } else {
     next();
   }

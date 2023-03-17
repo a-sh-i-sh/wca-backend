@@ -27,19 +27,21 @@ const creatingStaff = async (req, res, next) => {
           return res.status(500).json({
             status: false,
             message: "Unable to add as a staff member",
-            // errors: err.sqlMessage
+            errors: [err]
           });
         }
         if(result.affectedRows){
         return res.status(201).json({
           status: true,
           message: "Staff member added successfully",
-        });
+           errors: []
+      });
       } else {
         return res.status(400).json({
           status: false,
           message: "Unable to add as a staff member",
-        });
+          errors: ["Staff Member not added"]
+      });
       }
       });
     } catch (error) {
@@ -47,6 +49,7 @@ const creatingStaff = async (req, res, next) => {
       return res.status(500).json({
         status: false,
         message: "Unable to add as a staff member",
+        errors: [error]
       });
     }
   } else {
@@ -142,7 +145,7 @@ LIMIT ${skip},${limit}`;
         return res.status(500).json({
           status: false,
           message: "Unable to fetch Staff List",
-          // errors: err.sqlMessage
+          errors: [err]
         });
       }
       if(result.length){
@@ -154,6 +157,7 @@ LIMIT ${skip},${limit}`;
         pages,
         page_records: result.length,
         total_records,
+        errors: []
       });
     } else {
       return res.status(200).json({
@@ -164,6 +168,7 @@ LIMIT ${skip},${limit}`;
         pages,
         page_records: result.length,
         total_records,
+        errors: ["No record found"]
       });
     }
     });
@@ -171,7 +176,11 @@ LIMIT ${skip},${limit}`;
     console.log(error);
     res
       .status(400)
-      .json({ status: false, message: "Unable to fetch Staff List" });
+      .json({ 
+      status: false,
+      message: "Unable to fetch Staff List",
+      errors: ["Unable to fetch Staff List"]
+    });
   }
 };
 const getStaffById = async (req, res) => {
@@ -184,7 +193,7 @@ const getStaffById = async (req, res) => {
         return res.status(500).json({
           status: false,
           message: "Unable to fetch Staff member details",
-          data: error,
+          errors: [error],
         });
       }
       if(results.length){
@@ -192,18 +201,21 @@ const getStaffById = async (req, res) => {
         status: true,
         message: "Staff member details fetch successfully",
         data: results[0],
+        errors:[]
       });
     }else{
       return res.status(400).json({
         status: false,
-        message: "Invalid staff id",
+        message: "Unable to fetch Staff member details",
+        errors:["Invalid staff id"]
       });
     }
     });
   } else {
     return res.status(400).json({
       status: false,
-      message: "Invalid staff id",
+      message: "Unable to fetch Staff member details",
+      errors:["Invalid staff id"]
     });
   }
 };
@@ -217,25 +229,28 @@ const deleteStaffById = async (req, res) => {
         return res.status(500).json({
           status: false,
           message: "Unable to removed Staff member",
-          data: error,
+          errors: [error],
         });
       }
       if(results.affectedRows){
       return res.status(200).json({
         status: true,
         message: "Staff member removed Successfully",
-      });
+      errors:[]
+    });
     }else{
       return res.status(400).json({
         status: false,
-        message: "Invalid staff id",
-      });
+        message: "Unable to removed Staff member",
+      errors:["Invalid staff id"]
+    });
     }
     });
   } else {
     return res.status(400).json({
       status: false,
-      message: "Invalid staff id",
+      message: "Unable to removed Staff member",
+      errors:["Invalid staff id"]
     });
   }
 };

@@ -15,6 +15,7 @@ const login = async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Please provide correct user_type 1 or 2",
+      errors:["Please provide correct user_type 1 or 2"]
     });
   }
 
@@ -25,6 +26,7 @@ const login = async (req, res) => {
       res.status(500).json({
         status: false,
         message: "Unable to login your account",
+        errors:["Unable to login your account"]
       });
     }
     if (result?.length === 0) {
@@ -34,6 +36,9 @@ const login = async (req, res) => {
           user_type === 1
             ? "You are not an admin"
             : "Email address don't exists, please create account first",
+          errors:[ user_type === 1
+            ? "You are not an admin"
+            : "Email address don't exists, please create account first"]
       });
     } else {
       const userMatch = result[0];
@@ -57,11 +62,13 @@ const login = async (req, res) => {
           message: `Login successfully`,
           token: token,
           id: userMatch.staff_id,
+          errors:[]
         });
       } else {
         res.status(401).json({
           status: false,
           message: "Invalid email or password",
+          errors:[ "Invalid email or password"]
         });
       }
     }

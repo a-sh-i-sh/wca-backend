@@ -23,13 +23,14 @@ const createuser = async (req, res) => {
       await res.status(500).json({
         status: false,
         message: "Unable to create account",
-        // errors: err.sqlMessage
+        errors: [err]
       });
     }
     if (result.length !== 0) {
       await res.status(400).json({
         status: false,
-        message: "Email address already used"
+        message: "Email address already used",
+        errors: []
       });
     }
   });
@@ -51,13 +52,14 @@ const createuser = async (req, res) => {
         return res.status(500).json({
           status: false,
           message: "Unable to create account",
-          // errors: err.sqlMessage
+          errors: [err]
         });
       }
       console.log("record inserted", result);
       res.header("auth-user").status(201).json({
         status: true,
         message: "Account has been created successfully",
+        errors: []
       });
     });
   } catch (error) {
@@ -65,6 +67,7 @@ const createuser = async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Unable to create account",
+      errors: [error]
     });
   }
 };
