@@ -14,6 +14,7 @@ const { getProfile, updateUser } = require("../controllers/profile/profile");
 const TokenVerify = require("../middlewares/TokenVerify");
 const uniqueEmail = require("../middlewares/uniqueFields/uniqueEmail");
 const staffValidation = require("../validators/staff");
+const VehicleManheim = require("../controllers/Manheim/VehicleManheim");
 
 // router.post("/auth/createuser", createuser);
 router.post("/auth/login", loginValidation, login);
@@ -31,5 +32,6 @@ router.post(
 );
 router.post("/staff/delete", TokenVerify, deleteStaffById);
 router.post("/staff/list", TokenVerify, getStaffList);
+router.post("/manheim",VehicleManheim);
 
 module.exports = router;

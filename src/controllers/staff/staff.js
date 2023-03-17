@@ -7,15 +7,16 @@ const creatingStaff = async (req, res, next) => {
   delete req.body.confirm_password;
 
   if (req.body.staff_id === "") {
+    console.log("Ram hellow ")
     const staff_id = uuid.v4();
     // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(req.body.password, salt);
     req.body.password = hashPassword;
-    const createdOn = new Date();
 
     try {
       req.body.staff_id = staff_id;
+      const createdOn = new Date();
       Object.assign(req.body, { createdOn });
       const keys = Object.keys(req.body);
       const values = Object.values(req.body);
@@ -56,7 +57,7 @@ const creatingStaff = async (req, res, next) => {
 
 const updateStaff = async (req,res) => {
   delete req.body.confirm_password;
-
+  console.log("body",req.body)
   if (req.body.password) {
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -77,20 +78,20 @@ const updateStaff = async (req,res) => {
         return res.status(500).json({
           status: false,
           message: "Unable to update staff member's details",
-          data: err,
+          errors: [err],
         });
       }
-      console.log("id wrong ",result)
       if(result.affectedRows){
       return res.status(200).json({
         status: true,
         message: "Staff member updated successfully",
+        errors: []
       });
     } else {
       return res.status(400).json({
         status: false,
-        message: "Invalid staff id",
-        mes: "hello"
+        message: "Unable to update staff member's details",
+        errors: ["Invalid staff id"]
       });
     }
     });
