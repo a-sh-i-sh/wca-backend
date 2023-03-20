@@ -24,20 +24,20 @@ const creatingStaff = async (req, res, next) => {
       await pool.query(sql, [values], (err, result) => {
         if (err) {
           console.log(err);
-          return res.status(500).json({
+          return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
             status: false,
             message: "Unable to add as a staff member",
             errors: [err]
           });
         }
         if(result.affectedRows){
-        return res.status(201).json({
+        return res.status(statusCodes.RESPONSE_CODES.CREATED).json({
           status: true,
           message: "Staff member added successfully",
            errors: []
       });
       } else {
-        return res.status(400).json({
+        return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
           status: false,
           message: "Unable to add as a staff member",
           errors: ["Staff Member not added"]
@@ -46,7 +46,7 @@ const creatingStaff = async (req, res, next) => {
       });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({
+      return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: "Unable to add as a staff member",
         errors: [error]
@@ -78,20 +78,20 @@ const updateStaff = async (req,res) => {
 
   await pool.query(sql, sqlValues, async (err, result) => {
       if (err) {
-        return res.status(500).json({
+        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
           status: false,
           message: "Unable to update staff member's details",
           errors: [err],
         });
       }
       if(result.affectedRows){
-      return res.status(200).json({
+      return res.status(statusCodes.RESPONSE_CODES.OK).json({
         status: true,
         message: "Staff member updated successfully",
         errors: []
       });
     } else {
-      return res.status(400).json({
+      return res.status(statusCodes.RESPONSE_CODES.UNAUTHORIZED).json({
         status: false,
         message: "Unable to update staff member's details",
         errors: ["Invalid staff id"]
@@ -142,14 +142,14 @@ LIMIT ${skip},${limit}`;
     await pool.query(sql, (err, result) => {
       if (err) {
         console.log(err);
-        return res.status(500).json({
+        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
           status: false,
           message: "Unable to fetch Staff List",
           errors: [err]
         });
       }
       if(result.length){
-      return res.status(201).json({
+      return res.status(statusCodes.RESPONSE_CODES.OK).json({
         status: true,
         message: "Staff List found successfully",
         staff_list: result,
@@ -160,7 +160,7 @@ LIMIT ${skip},${limit}`;
         errors: []
       });
     } else {
-      return res.status(200).json({
+      return res.status(statusCodes.RESPONSE_CODES.OK).json({
         status: false,
         message: "No record found",
         staff_list: result,
@@ -175,7 +175,7 @@ LIMIT ${skip},${limit}`;
   } catch (error) {
     console.log(error);
     res
-      .status(400)
+      .status(statusCodes.RESPONSE_CODES.BAD_REQUEST)
       .json({ 
       status: false,
       message: "Unable to fetch Staff List",
@@ -190,21 +190,21 @@ const getStaffById = async (req, res) => {
     [req.body.staff_id],
     (error, results, fields) => {
       if (error) {
-        return res.status(500).json({
+        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
           status: false,
           message: "Unable to fetch Staff member details",
           errors: [error],
         });
       }
       if(results.length){
-      return res.status(200).json({
+      return res.status(statusCodes.RESPONSE_CODES.OK).json({
         status: true,
         message: "Staff member details fetch successfully",
         data: results[0],
         errors:[]
       });
     }else{
-      return res.status(400).json({
+      return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
         status: false,
         message: "Unable to fetch Staff member details",
         errors:["Invalid staff id"]
@@ -212,7 +212,7 @@ const getStaffById = async (req, res) => {
     }
     });
   } else {
-    return res.status(400).json({
+    return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
       status: false,
       message: "Unable to fetch Staff member details",
       errors:["Invalid staff id"]
@@ -226,20 +226,20 @@ const deleteStaffById = async (req, res) => {
     [req.body.staff_id],
     (error, results, fields) => {
       if (error) {
-        return res.status(500).json({
+        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
           status: false,
           message: "Unable to removed Staff member",
           errors: [error],
         });
       }
       if(results.affectedRows){
-      return res.status(200).json({
+      return res.status(statusCodes.RESPONSE_CODES.OK).json({
         status: true,
         message: "Staff member removed Successfully",
       errors:[]
     });
     }else{
-      return res.status(400).json({
+      return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
         status: false,
         message: "Unable to removed Staff member",
       errors:["Invalid staff id"]
@@ -247,7 +247,7 @@ const deleteStaffById = async (req, res) => {
     }
     });
   } else {
-    return res.status(400).json({
+    return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
       status: false,
       message: "Unable to removed Staff member",
       errors:["Invalid staff id"]

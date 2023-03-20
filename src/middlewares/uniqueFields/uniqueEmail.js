@@ -13,14 +13,14 @@ const uniqueEmail = async (req, res, next) => {
   pool.query(sql, sqlValues, (err, result) => {
     if (err) {
       console.log(err);
-      return res.status(500).json({
+      return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: "Unable to save staff member's details ",
         errors:["Unable to save staff member's details"]
       });
     }
     if (result.length) {
-      return res.status(409).json({
+      return res.status(statusCodes.RESPONSE_CODES.CONFLICT).json({
         status: false,
         message: "Email already exists",
         errors:["Unable to save staff member's details"]

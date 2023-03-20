@@ -8,21 +8,21 @@ const getProfile = async (req, res) => {
   const sql = `select id,firstName,lastName,phone,email from wca_users`;
   await pool.query(sql, (error, results, fields) => {
     if (error) {
-      return res.status(500).json({
+      return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: "Unable to fetch profile data",
         errors: [error],
       });
     }
     if (results.length) {
-      return res.status(200).json({
+      return res.status(statusCodes.RESPONSE_CODES.OK).json({
         status: true,
         message: "successfully found profile data",
         data: results[0],
         errors: [],
       });
     } else {
-      return res.status(400).json({
+      return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
         status: false,
         message: "No record found",
         data: results[0],
@@ -50,7 +50,7 @@ const updateUser = async (req, res) => {
 
     await pool.query(sql, sqlValues, async (err, result) => {
         if (err) {
-          return res.status(500).json({
+          return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
             status: false,
             message: "Unable to update profile",
             errors: [err],
@@ -58,13 +58,13 @@ const updateUser = async (req, res) => {
         }
         console.log("if id is wrong don't match",result);
         if (result.affectedRows) {
-          return res.status(200).json({
+          return res.status(statusCodes.RESPONSE_CODES.OK).json({
             status: true,
             message: "profile updated successfully",
             errors: ["Updated Successfully"],
           });
         } else {
-          return res.status(400).json({
+          return res.status(statusCodes.RESPONSE_CODES.UNAUTHORIZED).json({
             status: false,
             message: "Unable to update profile",
             errors: ["Invalid Id"],
@@ -73,7 +73,7 @@ const updateUser = async (req, res) => {
       }
     );
   } else {
-    return res.status(400).json({
+    return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
       status: false,
       message: "Unable to update profile",
       errors: ["Invalid Id"],

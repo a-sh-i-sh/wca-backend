@@ -20,14 +20,14 @@ const createuser = async (req, res) => {
   const emailID = req.body.email;
   await pool.query(sql, [emailID], async (err, result) => {
     if (err) {
-      await res.status(500).json({
+      await res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: "Unable to create account",
         errors: [err]
       });
     }
     if (result.length !== 0) {
-      await res.status(400).json({
+      await res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
         status: false,
         message: "Email address already used",
         errors: []
@@ -49,14 +49,14 @@ const createuser = async (req, res) => {
     await pool.query(sql, [values], (err, result) => {
       if (err) {
         console.log(err);
-        return res.status(500).json({
+        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
           status: false,
           message: "Unable to create account",
           errors: [err]
         });
       }
       console.log("record inserted", result);
-      res.header("auth-user").status(201).json({
+      res.header("auth-user").status(statusCodes.RESPONSE_CODES.OK).json({
         status: true,
         message: "Account has been created successfully",
         errors: []
@@ -64,7 +64,7 @@ const createuser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
+    res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
       status: false,
       message: "Unable to create account",
       errors: [error]

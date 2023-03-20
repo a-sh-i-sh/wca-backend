@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uuid = require("uuid");
 const pool = require("../../connection/db");
+const statusCodes = require('../../config/const')
 
 const login = async (req, res) => {
   const user_type = Number(req.body.user_type);
@@ -12,25 +13,24 @@ const login = async (req, res) => {
   } else if (user_type === 2) {
     sql = "SELECT * FROM wca_users WHERE email = ?";
   } else {
-    return res.status(500).json({
+    return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
       status: false,
       message: "Please provide correct user_type 1 or 2",
       errors:["Please provide correct user_type 1 or 2"]
     });
   }
-
   // Searching user detail for matching credential
   const emailID = req.body.email;
   await pool.query(sql, [emailID], async (err, result) => {
     if (err) {
-      res.status(500).json({
+      res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: "Unable to login your account",
         errors:["Unable to login your account"]
       });
     }
     if (result?.length === 0) {
-      res.status(400).json({
+      res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
         status: false,
         message:
           user_type === 1
@@ -65,7 +65,7 @@ const login = async (req, res) => {
           errors:[]
         });
       } else {
-        res.status(401).json({
+        res.status(statusCodes.RESPONSE_CODES.UNAUTHORIZED).json({
           status: false,
           message: "Invalid email or password",
           errors:[ "Invalid email or password"]
