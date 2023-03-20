@@ -17,9 +17,11 @@ const result = await axios({
     //   Accept: "application/json",
       Authorization: "Basic :",
     },
+    
   });
 
-  console.log("Res",result)
+  console.log("Res",result?.data)
+  res.status(200).json({status: true, data: result?.data})
 }
 
 module.exports = VehicleManheim
