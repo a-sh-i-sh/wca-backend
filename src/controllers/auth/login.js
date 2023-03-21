@@ -29,6 +29,7 @@ const login = async (req, res) => {
   const emailID = req.body.email;
   await pool.query(sql, [emailID], async (err, result) => {
     if (err) {
+      console.log(err)
       res.status(INTERNAL_SERVER_ERROR).json({
         status: false,
         code: 500,
@@ -48,6 +49,7 @@ const login = async (req, res) => {
         ],
       });
     } else {
+      console.log("result",result);
       const userMatch = result[0];
       const submittedPass = req.body.password;
       const savedPass = userMatch.password;
