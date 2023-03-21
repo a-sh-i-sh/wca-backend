@@ -2,12 +2,20 @@ require("dotenv").config();
 const bcrypt = require("bcrypt");
 const pool = require("../../connection/db");
 const uuid = require("uuid");
+const {
+  INTERNAL_SERVER_ERROR,
+  CREATED,
+  PROMPT_CODE,
+  OK_AND_COMPLETED,
+  BAD_REQUEST,
+  OK_WITH_CONFLICT,
+  OK,
+} = require("../../config/const");
 
 const creatingStaff = async (req, res, next) => {
   delete req.body.confirm_password;
 
   if (req.body.staff_id === "") {
-    console.log("Ram hellow ")
     const staff_id = uuid.v4();
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -23,44 +31,45 @@ const creatingStaff = async (req, res, next) => {
       const sql = `INSERT INTO wca_staff (${keys}) VALUES (?)`;
       await pool.query(sql, [values], (err, result) => {
         if (err) {
-          console.log(err);
-          return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
+          return res.status(INTERNAL_SERVER_ERROR).json({
             status: false,
-            message: "Unable to add as a staff member",
-            errors: [err]
+            code: INTERNAL_SERVER_ERROR,
+            message: "",
+            errors: ["Unable to add as a staff member"],
           });
         }
-        if(result.affectedRows){
-        return res.status(statusCodes.RESPONSE_CODES.CREATED).json({
-          status: true,
-          message: "Staff member added successfully",
-           errors: []
-      });
-      } else {
-        return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
-          status: false,
-          message: "Unable to add as a staff member",
-          errors: ["Staff Member not added"]
-      });
-      }
+        if (result.affectedRows) {
+          return res.status(CREATED).json({
+            status: true,
+            code: CREATED,
+            message: "Staff member added successfully",
+            errors: [],
+          });
+        } else {
+          return res.json({
+            status: false,
+            code: PROMPT_CODE,
+            message: "",
+            errors: ["Unable to add as a staff member"],
+          });
+        }
       });
     } catch (error) {
-      console.log(error);
-      return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
+      return res.status(INTERNAL_SERVER_ERROR).json({
         status: false,
-        message: "Unable to add as a staff member",
-        errors: [error]
+        code: INTERNAL_SERVER_ERROR,
+        message: "",
+        errors: ["Unable to add as a staff member"],
       });
     }
   } else {
-    next()
+    next();
   }
 };
 
-
-const updateStaff = async (req,res) => {
+const updateStaff = async (req, res) => {
   delete req.body.confirm_password;
-  console.log("body",req.body)
+  console.log("body", req.body);
   if (req.body.password) {
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -68,53 +77,69 @@ const updateStaff = async (req,res) => {
     req.body.password = hashPassword;
 
     var sql = `update wca_staff set firstName=?,lastName=?,phone=?,email=?,type=?,password=? where staff_id = ?`;
-    var sqlValues = [req.body.firstName,req.body.lastName,req.body.phone,req.body.email,req.body.type,req.body.password,req.body.staff_id]
+    var sqlValues = [
+      req.body.firstName,
+      req.body.lastName,
+      req.body.phone,
+      req.body.email,
+      req.body.type,
+      req.body.password,
+      req.body.staff_id,
+    ];
   } else {
     sql = `update wca_staff set firstName=?,lastName=?,phone=?,email=?,type=? where staff_id = ?`;
-    sqlValues = [req.body.firstName,req.body.lastName,req.body.phone,req.body.email,req.body.type,req.body.staff_id]
+    sqlValues = [
+      req.body.firstName,
+      req.body.lastName,
+      req.body.phone,
+      req.body.email,
+      req.body.type,
+      req.body.staff_id,
+    ];
   }
-  console.log("sql",sql)
-  console.log("sqlValues",sqlValues)
 
   await pool.query(sql, sqlValues, async (err, result) => {
-      if (err) {
-        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
-          status: false,
-          message: "Unable to update staff member's details",
-          errors: [err],
-        });
-      }
-      if(result.affectedRows){
-      return res.status(statusCodes.RESPONSE_CODES.OK).json({
-        status: true,
-        message: "Staff member updated successfully",
-        errors: []
-      });
-    } else {
-      return res.status(statusCodes.RESPONSE_CODES.UNAUTHORIZED).json({
+    if (err) {
+      return res.status(INTERNAL_SERVER_ERROR).json({
         status: false,
-        message: "Unable to update staff member's details",
-        errors: ["Invalid staff id"]
+        code: INTERNAL_SERVER_ERROR,
+        message: "",
+        errors: ["Unable to update staff member's details"],
       });
     }
-    });
-}
+    if (result.affectedRows) {
+      return res.status(OK_AND_COMPLETED).json({
+        status: true,
+        code: OK_AND_COMPLETED,
+        message: "Staff member updated successfully",
+        errors: [],
+      });
+    } else {
+      return res.json({
+        status: false,
+        code: BAD_REQUEST,
+        message: "",
+        errors: ["Invalid staff id"],
+      });
+    }
+  });
+};
 
 const getAll = (search) => {
   return new Promise((resolve, reject) => {
-  const sql = `SELECT * FROM wca_staff WHERE firstName LIKE '%${search}%'
+    const sql = `SELECT * FROM wca_staff WHERE firstName LIKE '%${search}%'
   OR lastName LIKE '%${search}%'
   OR email LIKE '%${search}%'
   OR type LIKE '%${search}%'
   OR phone LIKE '%${search}%'`;
-  pool.query(sql, (err, result) => {
-    if (err) {
-      console.log(err);
-      reject(err);
-    }
-    resolve(result.length);
+    pool.query(sql, (err, result) => {
+      if (err) {
+        console.log(err);
+        reject(err);
+      }
+      resolve(result.length);
+    });
   });
-});
 };
 
 const getStaffList = async (req, res) => {
@@ -128,9 +153,9 @@ const getStaffList = async (req, res) => {
 
     const total_records = await getAll(search);
     const pages =
-    total_records % limit === 0
-      ? Math.trunc(total_records / limit)
-      : Math.trunc(total_records / limit) + 1;
+      total_records % limit === 0
+        ? Math.trunc(total_records / limit)
+        : Math.trunc(total_records / limit) + 1;
 
     const sql = `SELECT * FROM wca_staff WHERE firstName LIKE '%${search}%'
 OR lastName LIKE '%${search}%'
@@ -141,117 +166,133 @@ ORDER BY ${sortColumn} ${sort}
 LIMIT ${skip},${limit}`;
     await pool.query(sql, (err, result) => {
       if (err) {
-        console.log(err);
-        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
+        return res.status(INTERNAL_SERVER_ERROR).json({
           status: false,
-          message: "Unable to fetch Staff List",
-          errors: [err]
+          code: INTERNAL_SERVER_ERROR,
+          message: "",
+          errors: ["Unable to fetch Staff List"],
         });
       }
-      if(result.length){
-      return res.status(statusCodes.RESPONSE_CODES.OK).json({
-        status: true,
-        message: "Staff List found successfully",
-        staff_list: result,
-        page,
-        pages,
-        page_records: result.length,
-        total_records,
-        errors: []
-      });
-    } else {
-      return res.status(statusCodes.RESPONSE_CODES.OK).json({
-        status: false,
-        message: "No record found",
-        staff_list: result,
-        page,
-        pages,
-        page_records: result.length,
-        total_records,
-        errors: ["No record found"]
-      });
-    }
+      if (result.length) {
+        return res.json({
+          status: true,
+          code: OK_AND_COMPLETED,
+          message: "Staff List found successfully",
+          staff_list: result,
+          page,
+          pages,
+          page_records: result.length,
+          total_records,
+          errors: [],
+        });
+      } else {
+        return res.json({
+          status: false,
+          code: OK_WITH_CONFLICT,
+          message: "",
+          staff_list: result,
+          page,
+          pages,
+          page_records: result.length,
+          total_records,
+          errors: ["No record found"],
+        });
+      }
     });
   } catch (error) {
-    console.log(error);
-    res
-      .status(statusCodes.RESPONSE_CODES.BAD_REQUEST)
-      .json({ 
+    res.status(INTERNAL_SERVER_ERROR).json({
       status: false,
-      message: "Unable to fetch Staff List",
-      errors: ["Unable to fetch Staff List"]
+      code: INTERNAL_SERVER_ERROR,
+      message: "",
+      errors: ["Unable to fetch Staff List"],
     });
   }
 };
 const getStaffById = async (req, res) => {
-  if(req.body.staff_id){
-  await pool.query(
-    `select staff_id,firstName,lastName,phone,email,type from wca_staff where staff_id = ?`,
-    [req.body.staff_id],
-    (error, results, fields) => {
-      if (error) {
-        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
-          status: false,
-          message: "Unable to fetch Staff member details",
-          errors: [error],
-        });
+  if (req.body.staff_id) {
+    await pool.query(
+      `select staff_id,firstName,lastName,phone,email,type from wca_staff where staff_id = ?`,
+      [req.body.staff_id],
+      (error, results, fields) => {
+        if (error) {
+          return res.status(INTERNAL_SERVER_ERROR).json({
+            status: false,
+            code: INTERNAL_SERVER_ERROR,
+            message: "",
+            errors: ["Unable to fetch Staff member details"],
+          });
+        }
+        if (results.length) {
+          return res.status(OK_AND_COMPLETED).json({
+            status: true,
+            code: OK_AND_COMPLETED,
+            message: "Staff member details fetch successfully",
+            data: results[0],
+            errors: [],
+          });
+        } else {
+          return res.json({
+            status: false,
+            code: BAD_REQUEST,
+            message: "",
+            errors: ["Invalid staff id"],
+          });
+        }
       }
-      if(results.length){
-      return res.status(statusCodes.RESPONSE_CODES.OK).json({
-        status: true,
-        message: "Staff member details fetch successfully",
-        data: results[0],
-        errors:[]
-      });
-    }else{
-      return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
-        status: false,
-        message: "Unable to fetch Staff member details",
-        errors:["Invalid staff id"]
-      });
-    }
-    });
+    );
   } else {
-    return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
+    return res.json({
       status: false,
-      message: "Unable to fetch Staff member details",
-      errors:["Invalid staff id"]
+      code: BAD_REQUEST,
+      message: "",
+      errors: ["Invalid staff id"],
     });
   }
 };
 const deleteStaffById = async (req, res) => {
-  if(req.body.staff_id){
-  await pool.query(
-    `DELETE  from wca_staff where staff_id = ?`,
-    [req.body.staff_id],
-    (error, results, fields) => {
-      if (error) {
-        return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
-          status: false,
-          message: "Unable to removed Staff member",
-          errors: [error],
-        });
+  if (req.body.staff_id) {
+    await pool.query(
+      `DELETE  from wca_staff where staff_id = ?`,
+      [req.body.staff_id],
+      (error, results, fields) => {
+        if (error) {
+          return res.status(INTERNAL_SERVER_ERROR).json({
+            status: false,
+            code: INTERNAL_SERVER_ERROR,
+            message: "",
+            errors: ["Unable to removed Staff member"],
+          });
+        }
+        if (results.affectedRows) {
+          return res.json({
+            status: true,
+            code: OK,
+            message: "Staff member removed Successfully",
+            errors: [],
+          });
+        } else {
+          return res.json({
+            status: false,
+            code: OK_WITH_CONFLICT,
+            message: "",
+            errors: ["Staff member do not exists"],
+          });
+        }
       }
-      if(results.affectedRows){
-      return res.status(statusCodes.RESPONSE_CODES.OK).json({
-        status: true,
-        message: "Staff member removed Successfully",
-      errors:[]
-    });
-    }else{
-      return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
-        status: false,
-        message: "Unable to removed Staff member",
-      errors:["Invalid staff id"]
-    });
-    }
-    });
+    );
   } else {
-    return res.status(statusCodes.RESPONSE_CODES.BAD_REQUEST).json({
+    return res.json({
       status: false,
-      message: "Unable to removed Staff member",
-      errors:["Invalid staff id"]
+      code: BAD_REQUEST,
+      message: "",
+      errors: ["Invalid staff id"],
     });
   }
 };
-module.exports = { creatingStaff, getStaffList, getStaffById, updateStaff, deleteStaffById };
+module.exports = {
+  creatingStaff,
+  getStaffList,
+  getStaffById,
+  updateStaff,
+  deleteStaffById,
+};
