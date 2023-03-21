@@ -2,6 +2,7 @@ require("dotenv").config();
 const bcrypt = require("bcrypt");
 const pool = require("../../connection/db");
 const uuid = require("uuid");
+const statusCodes = require('../../config/const')
 
 const creatingStaff = async (req, res, next) => {
   delete req.body.confirm_password;

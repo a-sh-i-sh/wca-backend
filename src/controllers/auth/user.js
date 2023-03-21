@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const pool = require("../../connection/db");
 const uuid = require('uuid')
 const { registerValidation } = require("../../validators/auth");
+const statusCodes = require('../../config/const')
 // const uniqueidentifier = NEWID()
 const createuser = async (req, res) => {
   delete req.body.confirm_password;

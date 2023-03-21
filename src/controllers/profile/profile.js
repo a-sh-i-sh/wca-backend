@@ -3,6 +3,7 @@ const pool = require("../../connection/db");
 const uuid = require("uuid");
 const { registerValidation } = require("../../validators/auth");
 const result = uuid.v4();
+const statusCodes = require('../../config/const')
 
 const getProfile = async (req, res) => {
   const sql = `select id,firstName,lastName,phone,email from wca_users`;
