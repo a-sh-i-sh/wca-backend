@@ -16,7 +16,7 @@ const result = await axios({
 
   });
 
-  console.log("Res",result?.data)
+  // console.log("Res",result?.data)
   res.json({status: true, data: result?.data})
 }
 

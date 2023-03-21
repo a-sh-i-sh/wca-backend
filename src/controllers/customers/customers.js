@@ -12,37 +12,38 @@ const {
   OK,
 } = require("../../config/const");
 
-const creatingStaff = async (req, res, next) => {
+const creatingCustomer = async (req, res, next) => {
   delete req.body.confirm_password;
+  delete req.body.user_type;
 
-  if (req.body.staff_id === "") {
-    const staff_id = uuid.v4();
+  if (req.body.customer_id === "") {
+    const customer_id = uuid.v4();
     // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(req.body.password, salt);
     req.body.password = hashPassword;
 
     try {
-      req.body.staff_id = staff_id;
+      req.body.customer_id = customer_id;
       const createdOn = new Date();
       Object.assign(req.body, { createdOn });
       const keys = Object.keys(req.body);
       const values = Object.values(req.body);
-      const sql = `INSERT INTO wca_staff (${keys}) VALUES (?)`;
+      const sql = `INSERT INTO wca_users (${keys}) VALUES (?)`;
       await pool.query(sql, [values], (err, result) => {
         if (err) {
           return res.status(INTERNAL_SERVER_ERROR).json({
             status: false,
             code: INTERNAL_SERVER_ERROR,
             message: "",
-            errors: ["Unable to add as a staff member"],
+            errors: ["Unable to save customer details"],
           });
         }
         if (result.affectedRows) {
           return res.status(CREATED).json({
             status: true,
             code: CREATED,
-            message: "Staff member added successfully",
+            message: "Customer added successfully",
             errors: [],
           });
         } else {
@@ -50,7 +51,7 @@ const creatingStaff = async (req, res, next) => {
             status: false,
             code: PROMPT_CODE,
             message: "",
-            errors: ["Unable to add as a staff member"],
+            errors: ["Unable to save customer details"],
           });
         }
       });
@@ -59,7 +60,7 @@ const creatingStaff = async (req, res, next) => {
         status: false,
         code: INTERNAL_SERVER_ERROR,
         message: "",
-        errors: ["Unable to add as a staff member"],
+        errors: ["Unable to save customer details"],
       });
     }
   } else {
@@ -67,33 +68,35 @@ const creatingStaff = async (req, res, next) => {
   }
 };
 
-const updateStaff = async (req, res) => {
+const updateCustomer = async (req, res) => {
   delete req.body.confirm_password;
+  delete req.body.user_type;
+
   if (req.body.password) {
     // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(req.body.password, salt);
     req.body.password = hashPassword;
 
-    var sql = `update wca_staff set firstName=?,lastName=?,phone=?,email=?,type=?,password=? where staff_id = ?`;
+    var sql = `update wca_users set firstName=?,lastName=?,phone=?,email=?,address=?,password=? where customer_id = ?`;
     var sqlValues = [
       req.body.firstName,
       req.body.lastName,
       req.body.phone,
       req.body.email,
-      req.body.type,
+      req.body.address,
       req.body.password,
-      req.body.staff_id,
+      req.body.customer_id,
     ];
   } else {
-    sql = `update wca_staff set firstName=?,lastName=?,phone=?,email=?,type=? where staff_id = ?`;
+    sql = `update wca_staff set firstName=?,lastName=?,phone=?,email=?,address=? where customer_id = ?`;
     sqlValues = [
       req.body.firstName,
       req.body.lastName,
       req.body.phone,
       req.body.email,
-      req.body.type,
-      req.body.staff_id,
+      req.body.address,
+      req.body.customer_id,
     ];
   }
 
@@ -103,14 +106,14 @@ const updateStaff = async (req, res) => {
         status: false,
         code: INTERNAL_SERVER_ERROR,
         message: "",
-        errors: ["Unable to update staff member's details"],
+        errors: ["Unable to update customer details"],
       });
     }
     if (result.affectedRows) {
       return res.status(OK_AND_COMPLETED).json({
         status: true,
         code: OK_AND_COMPLETED,
-        message: "Staff member updated successfully",
+        message: "Customer details updated successfully",
         errors: [],
       });
     } else {
@@ -118,7 +121,7 @@ const updateStaff = async (req, res) => {
         status: false,
         code: BAD_REQUEST,
         message: "",
-        errors: ["Invalid staff id"],
+        errors: ["Invalid customer id"],
       });
     }
   });
@@ -288,9 +291,9 @@ const deleteStaffById = async (req, res) => {
   }
 };
 module.exports = {
-  creatingStaff,
-  getStaffList,
-  getStaffById,
-  updateStaff,
-  deleteStaffById,
+  creatingCustomer,
+//   getCustomerList,
+//   getCustomerById,
+  updateCustomer,
+//   deleteCustomerById,
 };
