@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { PRECONDITION_FAILED } = require("../config/const");
 
 const staffValidation = async (req, res, next) => {
   delete req.body.confirm_password;
@@ -16,9 +17,14 @@ const staffValidation = async (req, res, next) => {
 
   const { error } = await schema.validate(req.body);
   if (error) {
-    return res
-      .status(422)
-      .json({ status: false, errors: error.details , message:error.details[0].message });
+    return res.json({
+      status: false,
+      code: PRECONDITION_FAILED,
+      message: "",
+      errors: error.details.map((item) => {
+        return item.message;
+      }),
+    });
   } else {
     next();
   }

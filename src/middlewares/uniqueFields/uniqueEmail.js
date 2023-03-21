@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { INTERNAL_SERVER_ERROR, CONFLICT } = require("../../config/const");
 const pool = require("../../connection/db");
 
 const uniqueEmail = async (req, res, next) => {
@@ -12,18 +13,19 @@ const uniqueEmail = async (req, res, next) => {
   
   pool.query(sql, sqlValues, (err, result) => {
     if (err) {
-      console.log(err);
-      return res.status(statusCodes.RESPONSE_CODES.INTERNAL_SERVER_ERROR).json({
+      return res.status(INTERNAL_SERVER_ERROR).json({
         status: false,
-        message: "Unable to save staff member's details ",
+        code: INTERNAL_SERVER_ERROR,
+        message: "",
         errors:["Unable to save staff member's details"]
       });
     }
     if (result.length) {
-      return res.status(statusCodes.RESPONSE_CODES.CONFLICT).json({
+      return res.status(CONFLICT).json({
         status: false,
-        message: "Email already exists",
-        errors:["Unable to save staff member's details"]
+        code: CONFLICT,
+        message: "",
+        errors:["Email already exists"]
       });
     } else {
       next();

@@ -1,9 +1,10 @@
 const axios = require('axios')
 
 const VehicleListing = async (req,res) => {
-
+  // /vehicles/GetAllMakes?format=json
 const result = await axios({
-    url: "https://vpic.nhtsa.dot.gov/api"+"/vehicles/GetAllManufacturers?format=json&page=2",
+    url: "https://vpic.nhtsa.dot.gov/api"+"/vehicles/DecodeVin/5UXWX7C5*BA?format=json&modelyear=2011",
+    // url: "https://api.vinaudit.com/v2/query?vin=1VXBR12EXCP901214&key=VA_DEMO_KEY&format=json" // api for getting particular vehicle information
     method: "GET",
     // data,
     // body:JSON.stringify(data),
@@ -16,7 +17,7 @@ const result = await axios({
   });
 
   console.log("Res",result?.data)
-  res.status(200).json({status: true, data: result?.data})
+  res.json({status: true, data: result?.data})
 }
 
 module.exports = VehicleListing

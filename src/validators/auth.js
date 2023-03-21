@@ -1,8 +1,9 @@
 const Joi = require("joi");
+const { PRECONDITION_FAILED } = require("../config/const");
 
 const registerValidation = async (req, res, next) => {
   delete req.body.confirm_password;
-  
+
   const schema = Joi.object({
     id: Joi.string().allow(null, ""),
     firstName: Joi.string().required(),
@@ -13,9 +14,14 @@ const registerValidation = async (req, res, next) => {
   });
   const { error } = await schema.validate(req.body);
   if (error) {
-    return res
-      .status(422)
-      .send({ status: false, message: error.details[0].message });
+    return res.send({
+      status: false,
+      code: PRECONDITION_FAILED,
+      message: "",
+      errors: error.details.map((item) => {
+        return item.message;
+      }),
+    });
   } else {
     next();
   }
@@ -25,13 +31,18 @@ const loginValidation = async (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
-    user_type: Joi.number().required()
+    user_type: Joi.number().required(),
   });
   const { error } = await schema.validate(req.body);
   if (error) {
-    return res
-      .status(422)
-      .send({ status: false, message: error.details[0].message });
+    return res.send({
+      status: false,
+      code: PRECONDITION_FAILED,
+      message: "",
+      errors: error.details.map((item) => {
+        return item.message;
+      }),
+    });
   } else {
     next();
   }

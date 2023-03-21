@@ -1,4 +1,4 @@
- const RESPONSE_CODES ={
+module.exports = {
     OK			: 200, // The request was successfully completed.
     CREATED		: 201, // A new resource was successfully created.
     OK_AND_COMPLETED : 202, // The request was successful and detailed are completed
