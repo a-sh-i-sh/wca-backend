@@ -10,7 +10,6 @@ const {
   deleteStaffById,
 } = require("../controllers/staff/staff");
 const { registerValidation, loginValidation } = require("../validators/auth");
-const { getProfile, updateUser } = require("../controllers/profile/profile");
 const TokenVerify = require("../middlewares/TokenVerify");
 const uniqueEmail = require("../middlewares/uniqueFields/uniqueEmail");
 const staffValidation = require("../validators/staff");
@@ -20,13 +19,14 @@ const customerValidation = require("../validators/customer");
 const {
   creatingCustomer,
   updateCustomer,
+  getCustomerList,
+  getCustomerById,
+  deleteCustomerById,
 } = require("../controllers/customers/customers");
 
 // router.post("/auth/createuser", createuser);
 router.post("/auth/login", loginValidation, login);
 
-// router.post("/profile", TokenVerify, getProfile);
-// router.post("/update/profile", TokenVerify, registerValidation, updateUser);
 router.post("/staff/edit", TokenVerify, getStaffById);
 router.post(
   "/staff/create",
@@ -45,6 +45,10 @@ router.post(
   creatingCustomer,
   updateCustomer
 );
+router.post("/user/list", TokenVerify, getCustomerList);
+router.post("/user/edit", TokenVerify, getCustomerById);
+router.post("/user/delete", TokenVerify, deleteCustomerById);
+
 router.post("/manheim", VehicleManheim);
 router.post("/vehicle/list", VehicleListing);
 

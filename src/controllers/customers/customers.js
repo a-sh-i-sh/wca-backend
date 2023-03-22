@@ -89,7 +89,7 @@ const updateCustomer = async (req, res) => {
       req.body.customer_id,
     ];
   } else {
-    sql = `update wca_staff set firstName=?,lastName=?,phone=?,email=?,address=? where customer_id = ?`;
+    sql = `update wca_users set firstName=?,lastName=?,phone=?,email=?,address=? where customer_id = ?`;
     sqlValues = [
       req.body.firstName,
       req.body.lastName,
@@ -129,10 +129,9 @@ const updateCustomer = async (req, res) => {
 
 const getAll = (search) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM wca_staff WHERE firstName LIKE '%${search}%'
+    const sql = `SELECT * FROM wca_users WHERE firstName LIKE '%${search}%'
   OR lastName LIKE '%${search}%'
   OR email LIKE '%${search}%'
-  OR type LIKE '%${search}%'
   OR phone LIKE '%${search}%'`;
     pool.query(sql, (err, result) => {
       if (err) {
@@ -143,7 +142,7 @@ const getAll = (search) => {
   });
 };
 
-const getStaffList = async (req, res) => {
+const getCustomerList = async (req, res) => {
   try {
     const page = req.body.page ? Number(req.body.page) : 1;
     const limit = req.body.limit ? Number(req.body.limit) : 5;
@@ -158,10 +157,9 @@ const getStaffList = async (req, res) => {
         ? Math.trunc(total_records / limit)
         : Math.trunc(total_records / limit) + 1;
 
-    const sql = `SELECT * FROM wca_staff WHERE firstName LIKE '%${search}%'
+    const sql = `SELECT * FROM wca_users WHERE firstName LIKE '%${search}%'
 OR lastName LIKE '%${search}%'
 OR email LIKE '%${search}%'
-OR type LIKE '%${search}%'
 OR phone LIKE '%${search}%'
 ORDER BY ${sortColumn} ${sort}
 LIMIT ${skip},${limit}`;
@@ -171,15 +169,15 @@ LIMIT ${skip},${limit}`;
           status: false,
           code: INTERNAL_SERVER_ERROR,
           message: "",
-          errors: ["Unable to fetch Staff List"],
+          errors: ["Unable to fetch Customer List"],
         });
       }
       if (result.length) {
         return res.json({
           status: true,
           code: OK_AND_COMPLETED,
-          message: "Staff List found successfully",
-          staff_list: result,
+          message: "Customer List found successfully",
+          customer_list: result,
           page,
           pages,
           page_records: result.length,
@@ -191,7 +189,7 @@ LIMIT ${skip},${limit}`;
           status: false,
           code: OK_WITH_CONFLICT,
           message: "",
-          staff_list: result,
+          customer_list: result,
           page,
           pages,
           page_records: result.length,
@@ -205,29 +203,29 @@ LIMIT ${skip},${limit}`;
       status: false,
       code: INTERNAL_SERVER_ERROR,
       message: "",
-      errors: ["Unable to fetch Staff List"],
+      errors: ["Unable to fetch Customer List"],
     });
   }
 };
-const getStaffById = async (req, res) => {
-  if (req.body.staff_id) {
+const getCustomerById = async (req, res) => {
+  if (req.body.customer_id) {
     await pool.query(
-      `select staff_id,firstName,lastName,phone,email,type from wca_staff where staff_id = ?`,
-      [req.body.staff_id],
+      `select customer_id,firstName,lastName,phone,email,address from wca_users where customer_id = ?`,
+      [req.body.customer_id],
       (error, results, fields) => {
         if (error) {
           return res.status(INTERNAL_SERVER_ERROR).json({
             status: false,
             code: INTERNAL_SERVER_ERROR,
             message: "",
-            errors: ["Unable to fetch Staff member details"],
+            errors: ["Unable to fetch Customer details"],
           });
         }
         if (results.length) {
           return res.status(OK_AND_COMPLETED).json({
             status: true,
             code: OK_AND_COMPLETED,
-            message: "Staff member details fetch successfully",
+            message: "Customer details fetch successfully",
             data: results[0],
             errors: [],
           });
@@ -236,7 +234,7 @@ const getStaffById = async (req, res) => {
             status: false,
             code: BAD_REQUEST,
             message: "",
-            errors: ["Invalid staff id"],
+            errors: ["Invalid customer id"],
           });
         }
       }
@@ -246,29 +244,29 @@ const getStaffById = async (req, res) => {
       status: false,
       code: BAD_REQUEST,
       message: "",
-      errors: ["Invalid staff id"],
+      errors: ["Invalid customer id"],
     });
   }
 };
-const deleteStaffById = async (req, res) => {
-  if (req.body.staff_id) {
+const deleteCustomerById = async (req, res) => {
+  if (req.body.customer_id) {
     await pool.query(
-      `DELETE  from wca_staff where staff_id = ?`,
-      [req.body.staff_id],
+      `DELETE  from wca_users where customer_id = ?`,
+      [req.body.customer_id],
       (error, results, fields) => {
         if (error) {
           return res.status(INTERNAL_SERVER_ERROR).json({
             status: false,
             code: INTERNAL_SERVER_ERROR,
             message: "",
-            errors: ["Unable to removed Staff member"],
+            errors: ["Unable to remove customer record"],
           });
         }
         if (results.affectedRows) {
           return res.json({
             status: true,
             code: OK,
-            message: "Staff member removed Successfully",
+            message: "Customer record removed Successfully",
             errors: [],
           });
         } else {
@@ -276,7 +274,7 @@ const deleteStaffById = async (req, res) => {
             status: false,
             code: OK_WITH_CONFLICT,
             message: "",
-            errors: ["Staff member do not exists"],
+            errors: ["Customer records do not exists"],
           });
         }
       }
@@ -286,14 +284,14 @@ const deleteStaffById = async (req, res) => {
       status: false,
       code: BAD_REQUEST,
       message: "",
-      errors: ["Invalid staff id"],
+      errors: ["Invalid customer id"],
     });
   }
 };
 module.exports = {
   creatingCustomer,
-//   getCustomerList,
-//   getCustomerById,
+  getCustomerList,
+  getCustomerById,
   updateCustomer,
-//   deleteCustomerById,
+  deleteCustomerById,
 };
