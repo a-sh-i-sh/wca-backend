@@ -29,10 +29,10 @@ const customerValidation = async (req, res, next) => {
       }),
     });
   } else {
-    if (Number(req.body.user_type) === 1) {
-      await TokenVerify(req, res, next);
-    } else {
+    if (Number(req.body.user_type) !== 1 && req.body.customer_id === "") {
       next();
+    } else {
+      await TokenVerify(req, res, next);  //this is middleware called inside a function
     }
   }
 };
