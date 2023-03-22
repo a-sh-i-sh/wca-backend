@@ -8,7 +8,7 @@ const TokenVerify = (req, res, next) => {
     token = token.split(" ")[1];
     jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, valid) => {
       if (err) {
-        res.json({
+       res.json({
             status: false,
             code: UNAUTHORIZED,
             messages: "",

@@ -15,7 +15,7 @@ const customerValidation = async (req, res, next) => {
     password: Joi.string().required().allow(null, ""),
     user_type: Joi.number().required(),
     createdOn: Joi.date().allow(null, ""),
-    vehicles: Joi.number().allow(null, "")
+    vehicles: Joi.number().allow(null, ""),
   });
 
   const { error } = await schema.validate(req.body);
@@ -29,10 +29,11 @@ const customerValidation = async (req, res, next) => {
       }),
     });
   } else {
-    if(req.body.user_type === 1)
-      TokenVerify;
-    else
-    next();
+    if (Number(req.body.user_type) === 1) {
+      await TokenVerify(req, res, next);
+    } else {
+      next();
+    }
   }
 };
 
