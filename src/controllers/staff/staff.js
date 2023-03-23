@@ -124,13 +124,14 @@ const updateStaff = async (req, res) => {
   });
 };
 
-const getAll = (search) => {
+const getAll = (search,staff_id) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM wca_staff WHERE firstName LIKE '%${search}%'
+    const sql = `SELECT * FROM wca_staff WHERE staff_id != '${staff_id}' 
+  AND ( firstName LIKE '%${search}%'
   OR lastName LIKE '%${search}%'
   OR email LIKE '%${search}%'
   OR type LIKE '%${search}%'
-  OR phone LIKE '%${search}%'`;
+  OR phone LIKE '%${search}%' )`;
     pool.query(sql, (err, result) => {
       if (err) {
         reject(err);
@@ -149,17 +150,18 @@ const getStaffList = async (req, res) => {
     const sort = req.body.sort;
     const search = req.body.search ? req.body.search : "";
 
-    const total_records = await getAll(search);
+    const total_records = await getAll(search,req.body.staff_id);
     const pages =
       total_records % limit === 0
         ? Math.trunc(total_records / limit)
         : Math.trunc(total_records / limit) + 1;
 
-    const sql = `SELECT * FROM wca_staff WHERE firstName LIKE '%${search}%'
+    const sql = `SELECT *,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') AS createdOn FROM wca_staff WHERE staff_id != '${req.body.staff_id}'
+AND ( firstName LIKE '%${search}%'
 OR lastName LIKE '%${search}%'
 OR email LIKE '%${search}%'
 OR type LIKE '%${search}%'
-OR phone LIKE '%${search}%'
+OR phone LIKE '%${search}%' )
 ORDER BY ${sortColumn} ${sort}
 LIMIT ${skip},${limit}`;
     await pool.query(sql, (err, result) => {

@@ -24,7 +24,7 @@ const uniqueEmail = async (req, res, next) => {
       });
     }
     if (result.length) {
-      return res.status(CONFLICT).json({
+      return res.json({
         status: false,
         code: CONFLICT,
         message: "",

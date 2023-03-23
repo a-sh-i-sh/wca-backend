@@ -18,9 +18,9 @@ const login = async (req, res) => {
   } else if (user_type === 2) {
     sql = "SELECT * FROM wca_users WHERE email = ?";
   } else {
-    return res.status(INTERNAL_SERVER_ERROR).json({
+    return res.json({
       status: false,
-      code: 500,
+      code: BAD_REQUEST,
       message: "",
       errors: ["Please provide correct user_type 1 or 2"],
     });
@@ -43,8 +43,8 @@ const login = async (req, res) => {
         message: "",
         errors: [
           user_type === 1
-            ? "Admin do not exists"
-            : "Email address don't exists, please create account first",
+            ? "Admin does not exists"
+            : "Email address doesn't exists, please create account first",
         ],
       });
     } else {
@@ -67,7 +67,7 @@ const login = async (req, res) => {
         res.header("auth-token", token).json({
           status: true,
           code: OK,
-          message: `Login successfully`,
+          message: `Login successful`,
           token: token,
           id: userMatch.staff_id,
           errors: [],

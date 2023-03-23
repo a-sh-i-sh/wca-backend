@@ -30,6 +30,7 @@ const creatingCustomer = async (req, res, next) => {
       const keys = Object.keys(req.body);
       const values = Object.values(req.body);
       const sql = `INSERT INTO wca_users (${keys}) VALUES (?)`;
+      
       await pool.query(sql, [values], (err, result) => {
         if (err) {
           return res.status(INTERNAL_SERVER_ERROR).json({
@@ -157,7 +158,7 @@ const getCustomerList = async (req, res) => {
         ? Math.trunc(total_records / limit)
         : Math.trunc(total_records / limit) + 1;
 
-    const sql = `SELECT * FROM wca_users WHERE firstName LIKE '%${search}%'
+    const sql = `SELECT *,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') AS createdOn FROM wca_users WHERE firstName LIKE '%${search}%'
 OR lastName LIKE '%${search}%'
 OR email LIKE '%${search}%'
 OR phone LIKE '%${search}%'
@@ -225,7 +226,7 @@ const getCustomerById = async (req, res) => {
           return res.status(OK_AND_COMPLETED).json({
             status: true,
             code: OK_AND_COMPLETED,
-            message: "Customer details fetch successfully",
+            message: "Customer details found successfully",
             data: results[0],
             errors: [],
           });
@@ -266,7 +267,7 @@ const deleteCustomerById = async (req, res) => {
           return res.json({
             status: true,
             code: OK,
-            message: "Customer record removed Successfully",
+            message: "Customer record removed successfully",
             errors: [],
           });
         } else {
