@@ -30,7 +30,7 @@ const creatingCustomer = async (req, res, next) => {
       const keys = Object.keys(req.body);
       const values = Object.values(req.body);
       const sql = `INSERT INTO wca_users (${keys}) VALUES (?)`;
-      
+
       await pool.query(sql, [values], (err, result) => {
         if (err) {
           return res.status(INTERNAL_SERVER_ERROR).json({
@@ -158,7 +158,9 @@ const getCustomerList = async (req, res) => {
         ? Math.trunc(total_records / limit)
         : Math.trunc(total_records / limit) + 1;
 
-    const sql = `SELECT *,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') AS createdOn FROM wca_users WHERE firstName LIKE '%${search}%'
+    const sql = `SELECT customer_id,firstName,lastName,
+    phone,email,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p')
+    AS created_on,vehicles FROM wca_users WHERE firstName LIKE '%${search}%'
 OR lastName LIKE '%${search}%'
 OR email LIKE '%${search}%'
 OR phone LIKE '%${search}%'
@@ -275,7 +277,7 @@ const deleteCustomerById = async (req, res) => {
             status: false,
             code: OK_WITH_CONFLICT,
             message: "",
-            errors: ["Customer records do not exists"],
+            errors: ["Customer record does not exist"],
           });
         }
       }

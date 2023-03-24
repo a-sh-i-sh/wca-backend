@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const { createuser } = require("../controllers/auth/user");
 const { login } = require("../controllers/auth/login");
 const {
   creatingStaff,
@@ -24,9 +23,8 @@ const {
   deleteCustomerById,
 } = require("../controllers/customers/customers");
 
-// router.post("/auth/createuser", createuser);
-router.post("/auth/login", loginValidation, login);
 
+router.post("/auth/login", loginValidation, login);
 router.post("/staff/edit", TokenVerify, getStaffById);
 router.post(
   "/staff/create",

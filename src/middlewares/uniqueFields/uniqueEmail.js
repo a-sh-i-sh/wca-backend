@@ -28,7 +28,7 @@ const uniqueEmail = async (req, res, next) => {
         status: false,
         code: CONFLICT,
         message: "",
-        errors: ["Email already exists"],
+        errors: ["Email already exist"],
       });
     } else {
       next();

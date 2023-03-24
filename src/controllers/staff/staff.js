@@ -124,7 +124,7 @@ const updateStaff = async (req, res) => {
   });
 };
 
-const getAll = (search,staff_id) => {
+const getAll = (search, staff_id) => {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM wca_staff WHERE staff_id != '${staff_id}' 
   AND ( firstName LIKE '%${search}%'
@@ -150,13 +150,15 @@ const getStaffList = async (req, res) => {
     const sort = req.body.sort;
     const search = req.body.search ? req.body.search : "";
 
-    const total_records = await getAll(search,req.body.staff_id);
+    const total_records = await getAll(search, req.body.staff_id);
     const pages =
       total_records % limit === 0
         ? Math.trunc(total_records / limit)
         : Math.trunc(total_records / limit) + 1;
 
-    const sql = `SELECT *,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') AS createdOn FROM wca_staff WHERE staff_id != '${req.body.staff_id}'
+    const sql = `SELECT staff_id,firstName,lastName,
+    phone,email,type,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p')
+    AS created_on FROM wca_staff WHERE staff_id != '${req.body.staff_id}'
 AND ( firstName LIKE '%${search}%'
 OR lastName LIKE '%${search}%'
 OR email LIKE '%${search}%'
@@ -275,7 +277,7 @@ const deleteStaffById = async (req, res) => {
             status: false,
             code: OK_WITH_CONFLICT,
             message: "",
-            errors: ["Staff member do not exists"],
+            errors: ["Staff member does not exist"],
           });
         }
       }

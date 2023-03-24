@@ -8,9 +8,9 @@ const data = {
     password: "Palakbhagi@29"
 }
 const result = await axios({
-    url: "https://api.manheim.com/oauth2/token.oauth2",
+    url: "http://developer.manheim.com/#/apis/marketplace/valuations",
     method: "POST",
-    data,
+    // data,
     // body:JSON.stringify(data),
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

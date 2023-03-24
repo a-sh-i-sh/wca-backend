@@ -43,8 +43,8 @@ const login = async (req, res) => {
         message: "",
         errors: [
           user_type === 1
-            ? "Admin does not exists"
-            : "Email address doesn't exists, please create account first",
+            ? "Admin does not exist"
+            : "Email address doesn't exist, please create account first",
         ],
       });
     } else {
