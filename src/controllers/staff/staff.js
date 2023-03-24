@@ -131,7 +131,8 @@ const getAll = (search, staff_id) => {
   OR lastName LIKE '%${search}%'
   OR email LIKE '%${search}%'
   OR type LIKE '%${search}%'
-  OR phone LIKE '%${search}%' )`;
+  OR phone LIKE '%${search}%'
+  OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' )`;
     pool.query(sql, (err, result) => {
       if (err) {
         reject(err);
@@ -163,7 +164,8 @@ AND ( firstName LIKE '%${search}%'
 OR lastName LIKE '%${search}%'
 OR email LIKE '%${search}%'
 OR type LIKE '%${search}%'
-OR phone LIKE '%${search}%' )
+OR phone LIKE '%${search}%'
+OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' )
 ORDER BY ${sortColumn} ${sort}
 LIMIT ${skip},${limit}`;
     await pool.query(sql, (err, result) => {

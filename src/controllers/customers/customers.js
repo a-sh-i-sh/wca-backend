@@ -133,7 +133,9 @@ const getAll = (search) => {
     const sql = `SELECT * FROM wca_users WHERE firstName LIKE '%${search}%'
   OR lastName LIKE '%${search}%'
   OR email LIKE '%${search}%'
-  OR phone LIKE '%${search}%'`;
+  OR phone LIKE '%${search}%'
+  OR vehicles LIKE '%${search}%'
+  OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' `;
     pool.query(sql, (err, result) => {
       if (err) {
         reject(err);
@@ -164,6 +166,8 @@ const getCustomerList = async (req, res) => {
 OR lastName LIKE '%${search}%'
 OR email LIKE '%${search}%'
 OR phone LIKE '%${search}%'
+OR vehicles LIKE '%${search}%'
+OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%'
 ORDER BY ${sortColumn} ${sort}
 LIMIT ${skip},${limit}`;
     await pool.query(sql, (err, result) => {
