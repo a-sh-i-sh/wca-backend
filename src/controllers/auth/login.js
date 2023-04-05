@@ -48,7 +48,6 @@ const login = async (req, res) => {
         ],
       });
     } else {
-      console.log(result);
       const userMatch = result[0];
       const submittedPass = req.body.password;
       const savedPass = userMatch.password;
