@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const { PRECONDITION_FAILED } = require("../config/const");
-const TokenVerify = require("../middlewares/TokenVerify");
+const TokenVerify = require("../middlewares/tokenVerify/TokenVerify");
+const { send_response } = require("../config/reponseObject");
 
 const customerValidation = async (req, res, next) => {
   delete req.body.confirm_password;
@@ -20,19 +21,20 @@ const customerValidation = async (req, res, next) => {
 
   const { error } = await schema.validate(req.body);
   if (error) {
-    return res.json({
+    const obj = {
+      res,
       status: false,
       code: PRECONDITION_FAILED,
-      message: "",
       errors: error.details.map((item) => {
         return item.message;
       }),
-    });
+    };
+    send_response(obj)
   } else {
     if (Number(req.body.user_type) !== 1 && req.body.customer_id === "") {
       next();
     } else {
-      await TokenVerify(req, res, next);  //this is middleware called inside a function
+      await TokenVerify(req, res, next);  //this is middleware called inside a function and next() call in tokenVerify
     }
   }
 };

@@ -1,6 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const { UNAUTHORIZED, FORBIDDEN } = require("../config/const");
+const { UNAUTHORIZED, FORBIDDEN } = require("../../config/const");
+const { send_response } = require("../../config/reponseObject");
 
 const TokenVerify = (req, res, next) => {
   let token = req.headers["authorization"];
@@ -8,23 +9,25 @@ const TokenVerify = (req, res, next) => {
     token = token.split(" ")[1];
     jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, valid) => {
       if (err) {
-       res.json({
+       const obj = {
+            res,
             status: false,
             code: UNAUTHORIZED,
-            messages: "",
             errors: ["Your token is expired, please login again"],
-          });
+          };
+          return send_response(obj)
       } else {
         next();
       }
     });
   } else {
-    res.json({
+    const obj = {
+        res,
         status: false,
         code: FORBIDDEN,
-        messages: "",
         errors: ["Please add token in header"],
-      });
+      };
+      return send_response(obj)
   }
 };
 
