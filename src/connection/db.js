@@ -10,13 +10,12 @@ const dbConnectionInfo = {
 };
 
 // const dbConnectionInfo = {
-//     host: "localhost",
-//     user: "b4orient_wca",
-//     password: "2B?NV8L.pSHC",
-//     connectionLimit: 10, //mysql connection pool length
-//     database: "b4orient_wca",
-//   };
-
+//   host: "localhost",
+//   user: "b4orient_wca",
+//   password: "2B?NV8L.pSHC",
+//   connectionLimit: 10, //mysql connection pool length
+//   database: "b4orient_wca",
+// };
 
 //create mysql connection pool
 var dbconnection = createPool(dbConnectionInfo);
@@ -34,7 +33,6 @@ dbconnection.on("connection", function (connection) {
 });
 
 module.exports = dbconnection;
-
 
 //   For mysql single connection
 //    var dbconnection = createConnection(
