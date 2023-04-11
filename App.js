@@ -21,6 +21,7 @@ app.use(helmet());
 app.use("/api", web);
 
 
+
 app.get("/", (req, res) => {
   res.send("Welcome to WCA Application!!!");
 });
