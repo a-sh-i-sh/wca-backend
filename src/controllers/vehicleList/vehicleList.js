@@ -12,13 +12,32 @@ const {
 } = require("../../config/encrypt_decrypt");
 const { send_sqlError, send_response } = require("../../config/reponseObject");
 const pool = require("../../connection/db");
+const Blackbook = require("../../middlewares/Blackbook/Blackbook");
+const MarketCheckUsedCar = require("../../middlewares/Marketcheck/MarketPrice");
+const VehicleDetail = require("../../middlewares/NHTSA/VehicleDetail");
 
-const AddVehicles = async (req, res) => {
+const AddVehicles = async (req, res, next) => {
+  if(req.body.vehicles_id){
   try {
-    const createdOn = new Date();
-    Object.assign(req.body, { createdOn });
-    const keys = Object.keys(req.body);
-    const values = Object.values(req.body);
+    const created_on = new Date();
+    const bdata = VehicleDetail(req.body.vin);
+    if(bdata === 400){
+      const obj ={
+        res,
+        status: true,
+        code: BAD_REQUEST,
+        errors: ["Uable to fetch data from MarketChek api"]
+      }
+      return send_response(obj)
+    }
+    const keys = ["vin", "make", "year", "model", "createdOn"];
+    const values = [
+      req.body.vin,
+      bdata.make,
+      bdata.year,
+      bdata.model,
+      created_on,
+    ];
     const sql = `INSERT INTO wca_negotiating_vehicles (${keys}) VALUES (?)`;
     await pool.query(sql, [values], (err, result) => {
       if (err) {
@@ -57,12 +76,18 @@ const AddVehicles = async (req, res) => {
     };
     return send_response(obj);
   }
+}else{
+  next()
+}
 };
 
 const getAll = (search) => {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM wca_negotiating_vehicles WHERE is_deleted = 0
     AND ( vin LIKE '%${search}%'
+    OR make LIKE '%${search}%'
+    OR year LIKE '%${search}%'
+    OR model LIKE '%${search}%'
     OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' )`;
     pool.query(sql, (err, result) => {
       if (err) {
@@ -88,9 +113,12 @@ const getVehiclesList = async (req, res) => {
         ? Math.trunc(total_records / limit)
         : Math.trunc(total_records / limit) + 1;
 
-    const sql = `SELECT vehicles_id,vin, DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p')
+    const sql = `SELECT vehicles_id,vin,make,year,model,trade_price,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p')
       AS created_on FROM wca_negotiating_vehicles WHERE is_deleted = 0
   AND ( vin LIKE '%${search}%'
+  OR make LIKE '%${search}%'
+  OR year LIKE '%${search}%'
+  OR model LIKE '%${search}%'
   OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' )
   ORDER BY ${sortColumn} ${sort}
   LIMIT ${skip},${limit}`;
@@ -140,8 +168,8 @@ const getVehiclesList = async (req, res) => {
 
 const getVehiclesById = async (req, res) => {
   try {
-    const sql = `Select vin from wca_negotiating_vehicles where is_deleted = 0 AND vehicles_id = ?`;
-    await pool.query(sql, [decrypt_id], async (err, result) => {
+    const sql = `Select vehicles_id,vin,make,year,model,trade_price FROM wca_negotiating_vehicles WHERE is_deleted = 0 AND vehicles_id = ?`;
+    await pool.query(sql, [req.body.vehicles_id], async (err, result) => {
       if (err) {
         return send_sqlError(res);
         // return res.status(INTERNAL_SERVER_ERROR).json({
@@ -152,24 +180,16 @@ const getVehiclesById = async (req, res) => {
         // });
       }
       if (result.length) {
-        Object.assign(result[0], { vehicles_id: req.body.vehicles_id });
+        result[0].vehicles_id = EncryptedData(result[0].vehicles_id);
+      }
         const obj = {
           res,
           status: true,
           code: OK_AND_COMPLETED,
-          message: "Vehicle details found successfully",
-          data: result[0],
+          message: result?.length? "Vehicle details found successfully":"No record found",
+          data: result?.length? result[0] : result,
         };
         return send_response(obj);
-      } else {
-        const obj = {
-          res,
-          status: false,
-          code: BAD_REQUEST,
-          errors: ["Invalid vehicles id"],
-        };
-        return send_response(obj);
-      }
     });
   } catch (err) {
     const obj = {
@@ -208,7 +228,7 @@ const deleteVehiclesById = async (req, res) => {
           res,
           status: false,
           code: BAD_REQUEST,
-          errors: ["Invalid vehicles id"],
+          errors: ["Vehicle record doesn't exist"],
         };
         return send_response(obj);
       }
