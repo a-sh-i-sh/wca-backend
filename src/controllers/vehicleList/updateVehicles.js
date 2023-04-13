@@ -19,21 +19,21 @@ const updateVehicles = async (req, res) => {
     // please update the createdOn & is_deleted replace by 0 and its other data (Which Already deleted)
     try {
       const created_on = new Date();
-      const bdata = VehicleDetail(req.body.vin);
-      if(bdata === 400){
-        const obj ={
+      const Vdata = await VehicleDetail(req.body.vin);
+      if (Vdata === 400) {
+        const obj = {
           res,
           status: true,
           code: BAD_REQUEST,
-          errors: ["Uable to fetch data from MarketChek api"]
-        }
-        return send_response(obj)
+          errors: ["Uable to fetch data from MarketChek api"],
+        };
+        return send_response(obj);
       }
       const sql = `update wca_negotiating_vehicles set make=?,year=?,model=?,createdOn=?,is_deleted=? where vin=? AND vehicles_id=?`;
       const sqlValues = [
-        bdata.make,
-        bdata.year,
-        bdata.model,
+        Vdata.make,
+        Vdata.year,
+        Vdata.model,
         created_on,
         0,
         req.body.vin,
@@ -79,21 +79,24 @@ const updateVehicles = async (req, res) => {
   } else {
     // please update the other data of vin (Whose is_deleted is 0)
     try {
-      const bData = VehicleDetail(req.body.vin);
-      if(bdata === 400){
-        const obj ={
+      // const MData = MarketCheckUsedCar(req.body.vin, Number(req.body.miles));
+      const MData = {make: "GMC", year: "2008", model:"sierra 1550", miles: Number(req.body.miles), trade_price: 1700}
+      if (MData === 400) {
+        const obj = {
           res,
           status: true,
           code: BAD_REQUEST,
-          errors: ["Uable to fetch data from MarketChek api"]
-        }
-        return send_response(obj)
+          errors: ["Uable to fetch data from MarketChek api"],
+        };
+        return send_response(obj);
       }
-      const sql = `update wca_negotiating_vehicles set make=?,year=?,model=?, where vehicles_id`;
+      const sql = `update wca_negotiating_vehicles set make=?,year=?,model=?,miles=?,trade_price=? where vehicles_id=?`;
       const sqlValues = [
-        bData.make,
-        bData.year,
-        bData.model,
+        MData.make,
+        MData.year,
+        MData.model,
+        MData.miles,
+        MData.trade_price,
         req.body.vehicles_id,
       ];
 

@@ -16,12 +16,13 @@ const VehicleDetail = async (vin) => {
       },
     });
 
-    // console.log("Res",result?.data)
-    const data = result?.data?.data?.Results[0];
+    console.log("Res",result?.data)
+    const data = result?.data?.Results[0];
+    console.log("res",data)
     return {
-      "make": data?.Make,
-      "year": data?.ModelYear,
-      "model": data?.Model,
+      make: data?.Make,
+      year: data?.ModelYear,
+      model: data?.Model,
     }
   } catch (err) {
     console.log(err);

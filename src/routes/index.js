@@ -13,7 +13,6 @@ const TokenVerify = require("../middlewares/tokenVerify/TokenVerify");
 const uniqueEmail = require("../middlewares/uniqueFields/uniqueEmail");
 const staffValidation = require("../validators/staff");
 // const VehicleManheim = require("../middlewares/Manheim/VehicleManheim");
-// const VehicleDetail = require("../middlewares/NHTSA/VehicleDetail");
 const customerValidation = require("../validators/customer");
 const {
   creatingCustomer,
@@ -23,7 +22,7 @@ const {
   deleteCustomerById,
 } = require("../controllers/customers/customers");
 // const Blackbook = require("../middlewares/Blackbook/Blackbook");
-// const MarketPrice = require("../middlewares/Marketcheck/MarketPrice");
+const {LocalMarket} = require("../controllers/localMarket/localMarket");
 const {
   AddVehicles,
   getVehiclesList,
@@ -34,7 +33,6 @@ const AddVehiclesValidation = require("../validators/AddVehicles");
 const uniqueVIN = require("../middlewares/uniqueFields/uniqueVIN");
 const identifyID = require("../middlewares/ID_Identifier/id_identifier");
 const { EncryptedData } = require("../config/encrypt_decrypt");
-const send_response = require("../config/reponseObject");
 const updateVehicles = require("../controllers/vehicleList/updateVehicles");
 
 router.post("/auth/login", loginValidation, login);
@@ -77,9 +75,7 @@ router.post("/vehilces/edit", TokenVerify, identifyID, getVehiclesById);
 router.post("/vehicles/delete", TokenVerify, identifyID, deleteVehiclesById);
 
 // router.post("/manheim", VehicleManheim);
-// router.post("/vehicle/NHTSA/detail", VehicleDetail);
-
 // router.post("/blackbook/usedcar", Blackbook);
-// router.post("/marketprice/usedcar", MarketPrice);
+router.post("/localMarket",LocalMarket );
 
 module.exports = router;

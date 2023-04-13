@@ -17,11 +17,11 @@ const MarketCheckUsedCar = require("../../middlewares/Marketcheck/MarketPrice");
 const VehicleDetail = require("../../middlewares/NHTSA/VehicleDetail");
 
 const AddVehicles = async (req, res, next) => {
-  if(req.body.vehicles_id){
+  if(req.body.vehicles_id === ""){
   try {
     const created_on = new Date();
-    const bdata = VehicleDetail(req.body.vin);
-    if(bdata === 400){
+    const Vdata = await VehicleDetail(req.body.vin);
+    if(Vdata === 400){
       const obj ={
         res,
         status: true,
@@ -33,9 +33,9 @@ const AddVehicles = async (req, res, next) => {
     const keys = ["vin", "make", "year", "model", "createdOn"];
     const values = [
       req.body.vin,
-      bdata.make,
-      bdata.year,
-      bdata.model,
+      Vdata.make,
+      Vdata.year,
+      Vdata.model,
       created_on,
     ];
     const sql = `INSERT INTO wca_negotiating_vehicles (${keys}) VALUES (?)`;
@@ -88,6 +88,7 @@ const getAll = (search) => {
     OR make LIKE '%${search}%'
     OR year LIKE '%${search}%'
     OR model LIKE '%${search}%'
+    OR trade_price LIKE '%${search}%'
     OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' )`;
     pool.query(sql, (err, result) => {
       if (err) {
@@ -119,6 +120,7 @@ const getVehiclesList = async (req, res) => {
   OR make LIKE '%${search}%'
   OR year LIKE '%${search}%'
   OR model LIKE '%${search}%'
+  OR trade_price LIKE '%${search}%'
   OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' )
   ORDER BY ${sortColumn} ${sort}
   LIMIT ${skip},${limit}`;
@@ -168,7 +170,7 @@ const getVehiclesList = async (req, res) => {
 
 const getVehiclesById = async (req, res) => {
   try {
-    const sql = `Select vehicles_id,vin,make,year,model,trade_price FROM wca_negotiating_vehicles WHERE is_deleted = 0 AND vehicles_id = ?`;
+    const sql = `Select vehicles_id,vin,make,year,model,miles,trade_price FROM wca_negotiating_vehicles WHERE is_deleted = 0 AND vehicles_id = ?`;
     await pool.query(sql, [req.body.vehicles_id], async (err, result) => {
       if (err) {
         return send_sqlError(res);
