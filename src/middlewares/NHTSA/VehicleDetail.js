@@ -1,9 +1,8 @@
 const axios = require("axios");
 const { OK, BAD_REQUEST } = require("../../config/const");
 
-const VehicleDetail = async (req, res, next) => {
+const VehicleDetail = async (vin) => {
   try {
-    const vin = req.body.vin;
 
     const result = await axios({
       url: "https://vpic.nhtsa.dot.gov/api" + `/vehicles/DecodeVinValuesExtended/${vin}?format=json`, //"/vehicles/GetAllMakes?format=json", //"/vehicles/GetVehicleVariableValuesList/2?format=json",
@@ -17,21 +16,17 @@ const VehicleDetail = async (req, res, next) => {
       },
     });
 
-    // console.log("Res",result?.data)
-    res.json({
-      status: true,
-      code: OK,
-      message: "Request successful",
-      data: result?.data,
-      errors: [],
-    });
+    console.log("Res",result?.data)
+    const data = result?.data?.Results[0];
+    console.log("res",data)
+    return {
+      make: data?.Make,
+      year: data?.ModelYear,
+      model: data?.Model,
+    }
   } catch (err) {
-    res.json({
-      status: false,
-      code: BAD_REQUEST,
-      message: "",
-      errors: ["Unable to fetch market price used car api data"],
-    });
+    console.log(err);
+    return 400;
   }
 };
 

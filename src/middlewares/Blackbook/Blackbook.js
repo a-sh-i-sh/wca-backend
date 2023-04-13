@@ -1,9 +1,8 @@
 const axios = require("axios");
 const { OK, BAD_REQUEST } = require("../../config/const");
 
-const Blackbook = async (req, res, next) => {
+const Blackbook = async (vin) => {
   try {
-    let vin = req.body.vin;
     let username = "WeCashAutosAPI";
     let password = "7MR35W6w";
     let auth =
@@ -20,21 +19,23 @@ const Blackbook = async (req, res, next) => {
       },
     });
 
-    //   console.log("Response",result?.data)
-    res.json({
-      status: true,
-      code: OK,
-      message: "Request successful",
-      data: result?.data,
-      errors: [],
-    });
+    console.log("Response", result?.data);
+    return result?.data;
+    // res.json({
+    //   status: true,
+    //   code: OK,
+    //   message: "Request successful",
+    //   data: result?.data,
+    //   errors: [],
+    // });
   } catch (err) {
-    res.json({
-      status: false,
-      code: BAD_REQUEST,
-      message: "",
-      errors: ["Unable to fetch blackbook used car web api data"],
-    });
+    console.log(err);
+    // res.json({
+    //   status: false,
+    //   code: BAD_REQUEST,
+    //   message: "",
+    //   errors: ["Unable to fetch blackbook used car web api data"],
+    // });
   }
 };
 

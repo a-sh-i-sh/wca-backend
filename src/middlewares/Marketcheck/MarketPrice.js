@@ -1,17 +1,13 @@
 const axios = require("axios");
-const { BAD_REQUEST, OK } = require("../../config/const");
 
-const MarketPrice = async (req, res, next) => {
+const MarketCheckUsedCar = async (vin,miles) => {
   try {
-    const vin = req.body.vin;
     const hostedUrl = "api.marketcheck.com";
     const hostHeader = "marketcheck-prod.apigee.net";
     const api_key = "DosWiXXrYCAJJk7vWb5IinkSHYYLlBGW";
     const result = await axios({
-      url: `http://${hostedUrl}/v2/predict/car/price?api_key=${api_key}&car_type=used&vin=${vin}&miles=28741&base_exterior_color=Black&base_interior_color=Brown&zip=55033`,
+      url: `http://${hostedUrl}/v2/predict/car/price?api_key=${api_key}&car_type=used&vin=${vin}&miles=${miles}`,
       method: "GET",
-      // data,
-      // body:JSON.stringify(data),
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -19,22 +15,24 @@ const MarketPrice = async (req, res, next) => {
       },
     });
 
-    //   console.log("Response",result?.data)
-    res.json({
-      status: true,
-      code: OK,
-      message: "Request successful",
-      data: result?.data,
-      errors: [],
-    });
+      const data = result?.data;
+      if(data?.code === 422){
+        return 400;
+      }
+      return {"trade_price":data?.predicted_price, "year": data?.specs?.year, 
+      "make": data?.specs?.make, "model": data?.specs?.model, 
+      "miles": data?.specs?.miles,
+      "base_exterior_color": data?.specs?.base_exterior_color,
+      "base_interior_color": data?.specs?.base_interior_color,
+      "engine_size": data?.specs?.engine_size,
+      "cylinders": data?.specs?.cylinders,
+      "doors": data?.specs?.doors,
+    };
+
   } catch (err) {
-    res.json({
-      status: false,
-      code: BAD_REQUEST,
-      message: "",
-      errors: ["Unable to fetch market price used car api data"],
-    });
+    console.log(err);
+    return 400;
   }
 };
 
-module.exports = MarketPrice;
+module.exports = MarketCheckUsedCar;

@@ -316,7 +316,7 @@ const deleteStaffById = async (req, res) => {
           res,
           status: false,
           code: BAD_REQUEST,
-          errors: ["Staff member does not exist"],
+          errors: ["Staff member doesn't exist"],
         };
         return send_response(obj);
       }
