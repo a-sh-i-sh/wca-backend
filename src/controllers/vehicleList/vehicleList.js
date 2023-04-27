@@ -70,27 +70,15 @@ const AddVehicles = async (req, res, next) => {
   if (req.body.vehicles_id === "") {
     try {
       const created_on = new Date();
-      // const Vdata = await VehicleDetail(req.body.vin);
-      // if(Vdata === 400){
-      //   const obj = {
-      //     res,
-      //     status: true,
-      //     code: BAD_REQUEST,
-      //     errors: ["Uable to fetch data from MarketChek api"]
-      //   }
-      //   return send_response(obj)
-      // }
 
       const data = await buildMarketcheckData(req.body.vin);
       if (data?.length === 0) {
-        // MarketCheckUsedCar(res,vin,miles)
+       //call api for getting particular vin detials : vin decoder || MarketCheckUsedCar(res,vin,miles)
         const obj = {
           res,
           status: false,
           code: NOT_FOUND,
-          errors: ["This vin number doesn't exist in marketcheck."], 
-          //you need to call marketcheck search by condition for getting updated vin listing, then recall this mehod
-          //call api for getting particular vin detials 
+          errors: ["This vin number doesn't exist."],
         };
         return send_response(obj);
       }

@@ -82,7 +82,7 @@ const InsertSearchCarsData = async (req, res, data) => {
     })
 
     keys = ["vin", "photo_link", "type"].join(",");
-    data?.media?.photo_links?.map(async (item, index) => {
+    data?.media?.photo_links?.slice(0,3)?.map(async (item, index) => {
       values = [data?.vin, encodeURIComponent(item), 1]
         .map((val) => (typeof val === "string" ? `'${val}'` : val))
         .join(",");
@@ -95,7 +95,7 @@ const InsertSearchCarsData = async (req, res, data) => {
       })
     });
 
-    data?.media?.photo_links_cached?.map(async (item, index) => {
+    data?.media?.photo_links_cached?.slice(0,3)?.map(async (item, index) => {
       values = [data?.vin, encodeURIComponent(item), 2]
         .map((val) => (typeof val === "string" ? `'${val}'` : val))
         .join(",");

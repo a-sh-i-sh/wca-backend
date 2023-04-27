@@ -35,7 +35,7 @@ const identifyID = require("../middlewares/ID_Identifier/id_identifier");
 const { EncryptedData } = require("../config/encrypt_decrypt");
 const updateVehicles = require("../controllers/vehicleList/updateVehicles");
 const isUpdated = require("../middlewares/Marketcheck/isUpdated");
-const VehicleDetail = require("../middlewares/NHTSA/VehicleDetail");
+// const VehicleDetail = require("../middlewares/NHTSA/VehicleDetail");
 
 router.post("/auth/login", loginValidation, login);
 router.post(
@@ -79,7 +79,7 @@ router.post("/vehicles/delete", TokenVerify, identifyID, deleteVehiclesById);
 
 // router.post("/manheim", VehicleManheim);
 // router.post("/blackbook/usedcar", Blackbook);
-router.post("/vehicleDetails",VehicleDetail)
+// router.post("/vehicleDetailsNHTSA",VehicleDetail)
 router.post("/localMarket",LocalMarket );
 
 module.exports = router;

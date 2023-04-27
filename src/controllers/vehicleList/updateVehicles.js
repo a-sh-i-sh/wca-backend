@@ -21,16 +21,6 @@ const updateVehicles = async (req, res) => {
     // please update the createdOn & is_deleted replace by 0 and its other data (Which Already deleted)
     try {
       const created_on = new Date();
-      // const Vdata = await VehicleDetail(req.body.vin);
-      // if (Vdata === 400) {
-      //   const obj = {
-      //     res,
-      //     status: true,
-      //     code: BAD_REQUEST,
-      //     errors: ["Uable to fetch data from MarketChek api"],
-      //   };
-      //   return send_response(obj);
-      // }
       const data = await buildMarketcheckData(req.body.vin);
       if(data?.length === 0){
         const obj = {
