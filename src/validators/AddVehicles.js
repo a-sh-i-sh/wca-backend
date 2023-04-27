@@ -7,7 +7,6 @@ const AddVehiclesValidation = async (req, res, next) => {
   const schema = Joi.object({
     vehicles_id: Joi.string().allow(null, ""),
     vin: Joi.string().required(),
-    miles: Joi.number().allow(null, ""),
     createdOn: Joi.date().allow(null, ""),
   });
 

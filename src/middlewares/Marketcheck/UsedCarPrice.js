@@ -1,10 +1,12 @@
 const axios = require("axios");
+const { NOT_FOUND } = require("../../config/const");
+const { send_response } = require("../../config/reponseObject");
 
 const MarketCheckUsedCar = async (vin,miles) => {
   try {
     const hostedUrl = "api.marketcheck.com";
     const hostHeader = "marketcheck-prod.apigee.net";
-    const api_key = "DosWiXXrYCAJJk7vWb5IinkSHYYLlBGW";
+    const api_key = "M8XZ1ilmwWAAuSZSG8rfkrA4XH70EDoU";
     const result = await axios({
       url: `http://${hostedUrl}/v2/predict/car/price?api_key=${api_key}&car_type=used&vin=${vin}&miles=${miles}`,
       method: "GET",
@@ -17,6 +19,13 @@ const MarketCheckUsedCar = async (vin,miles) => {
 
       const data = result?.data;
       if(data?.code === 422){
+        // const obj = {
+        //   res,
+        //   status: false,
+        //   code: NOT_FOUND,
+        //   errors: data?.message ? [data?.message] : ["Unable to fetch this vin number's detail from marketcheck"],
+        // }
+        // return send_response(obj)
         return 400;
       }
       return {"trade_price":data?.predicted_price, "year": data?.specs?.year, 

@@ -1,7 +1,6 @@
 const { INTERNAL_SERVER_ERROR, CONFLICT } = require("../../config/const");
 const { send_sqlError, send_response } = require("../../config/reponseObject");
 const pool = require("../../connection/db");
-const updateVehicles = require("../../controllers/vehicleList/updateVehicles");
 
 const uniqueVIN = async (req,res,next) => {
   if(req.body.vehicles_id !== ""){
@@ -33,7 +32,7 @@ const uniqueVIN = async (req,res,next) => {
             // we need to update operation. so call updateVehicles(req,res); is_deleted = 0
             // console.log(result[0]);
             Object.assign(req.body, { vehicles_id : result[0].vehicles_id, createdOn: result[0].createdOn });
-            updateVehicles(req, res);
+            next();
           } else {
             next();
           }

@@ -2,8 +2,8 @@ module.exports = {
     marketcheck_vehicle_info: {
        tablename: "wca_marketcheck_vehicle_info",
        id: "id",
-       vehicle_id: "vehicle_id",
        vin: "vin",
+       vehicle_id: "vehicle_id",
        heading: "heading",
        miles: "miles",
        target_retail: "target_retail",
@@ -42,6 +42,7 @@ module.exports = {
         tablename: "wca_marketcheck_vehicle_media_info",
         id: "id",
         vin: "vin",
-        photo_link: "photo_link"
+        photo_link: "photo_link",
+        type: "type"
     }
 }

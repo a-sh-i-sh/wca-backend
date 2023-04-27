@@ -1,1 +1,97 @@
-// check for 24 hours updation and cron jobs else next()
+// 1) First of all, check the data of marketcheck is updatable or not otherwise use cron job.
+// 2) Apply different check for used or new car
+// 3) For Array list use loop inside this data will assign then
+// 4) A query for searching Vin number, exiting or not, will execute.
+// 5) Based on existance of vin, data of marketcheck will update or insert.
+
+const pool = require("../../connection/db");
+const { marketcheck_vehicle_info } = require("../../config/constTablesStruct");
+const {
+  InsertSearchCarsData,
+} = require("../../controllers/MarketCheck/InsertSearchByCondition");
+const {
+  UpdateSearchCarsData,
+} = require("../../controllers/MarketCheck/UpdateSearchBycondition");
+const SearchByCondition = require("./SearchByCondition");
+
+const CheckVin_Insert_Update = async (vin) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT ${marketcheck_vehicle_info?.id},${marketcheck_vehicle_info?.vin} FROM ${marketcheck_vehicle_info?.tablename} WHERE vin = ?`;
+    pool.query(sql, [vin], (err, result) => {
+      if (err) {
+        console.log("vehicle market build DATA", err);
+        reject(err);
+      }
+      resolve(result);
+    });
+  });
+};
+
+const isUpdated = async (req, res, next) => {
+  try {
+    //   const todayDate = new Date();
+    //   if (todayDate - updatedDate > 24 * 60 * 60 * 1000) {
+
+    let car_type = "used";
+    let include_relevant_links = "true";
+    let start = 0;
+    let rows = 50;
+    let APIDATA = await SearchByCondition(
+      car_type,
+      include_relevant_links,
+      start,
+      rows
+    );
+
+    await Promise.all(
+      APIDATA?.listings?.map(async (result, index) => {
+        let data = {
+          vin: result?.vin ? result?.vin : "",
+          vehicle_id: result?.id ? result?.id : "",
+          heading: result?.heading ? result?.heading : "",
+          miles: result?.miles ? result?.miles : "",
+          target_retail: result?.msrp ? result?.msrp : "",
+          ext_color: result?.exterior_color ? result?.exterior_color : "",
+          int_color: result?.interior_color ? result?.interior_color : "",
+          base_ext_color: result?.base_ext_color ? result?.base_ext_color : "",
+          base_int_color: result?.base_int_color ? result?.base_int_color : "",
+          dom: result?.dom ? result?.dom : "",
+          seller_type: result?.seller_type ? result?.seller_type : "",
+          media: result?.media ? result?.media : "",
+          dealer: {
+            vin: result?.vin ? result?.vin : "",
+            dealer_id: result?.dealer?.id ? result?.dealer?.id : "",
+            city: result?.dealer?.city ? result?.dealer?.city : "",
+            state: result?.dealer?.state ? result?.dealer?.state : "",
+            country: result?.dealer?.country ? result?.dealer?.country : "",
+          },
+          build: {
+            vin: result?.vin ? result?.vin : "",
+            year: result?.build?.year ? result?.build?.year : "",
+            make: result?.build?.make ? result?.build?.make : "",
+            model: result?.build?.model ? result?.build?.model : "",
+            fuel_type: result?.build?.fuel_type ? result?.build?.fuel_type : "",
+            doors: result?.build?.doors ? result?.build?.doors : "",
+            cylinders: result?.build?.cylinders ? result?.build?.cylinders : "",
+            engine: result?.build?.engine ? result?.build?.engine : "",
+          },
+        };
+
+        const existVin = await CheckVin_Insert_Update(result?.vin);
+        if (existVin.length === 0) {
+          await InsertSearchCarsData(req, res, data);
+        } else {
+          await UpdateSearchCarsData(req, res, data);
+        }
+      })
+    );
+    next();
+    //   } else {
+    //     next();
+    //   }
+  } catch (err) {
+    console.log("isUPdated page", err);
+  }
+};
+
+module.exports = isUpdated;
