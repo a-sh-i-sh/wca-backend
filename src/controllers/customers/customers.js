@@ -273,7 +273,7 @@ const getCustomerById = async (req, res) => {
           // });
         }
         if (results.length) {
-          results[0].customer_id = EncryptedData(results[0].customer_id);
+          results[0].customer_id = req.body.customer_id;
         }
 
         const obj = {

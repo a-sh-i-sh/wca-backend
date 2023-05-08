@@ -10,6 +10,7 @@ const uniqueVIN = async (req,res,next) => {
     sql = `SELECT * FROM wca_negotiating_vehicles WHERE vin=?`;
     sqlValues = [req.body.vin];
   }
+
     await pool.query(sql, sqlValues, (err, result) => {
         if (err) {
           return send_sqlError(res)

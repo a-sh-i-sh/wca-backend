@@ -20,9 +20,13 @@ module.exports = {
         id: "id",
         vin: "vin",
         dealer_id: "dealer_id",
+        name: "name",
         city: "city",
         state: "state",
-        country: "country"
+        country: "country",
+        zip: "zip",
+        phone: "phone",
+        seller_email: "seller_email",
     },
 
     marketcheck_vehicle_build_info: {
@@ -35,7 +39,14 @@ module.exports = {
         fuel_type: "fuel_type",
         doors: "doors",
         cylinders: "cylinders",
-        engine: "engine"
+        engine: "engine",
+        transmission: "transmission",
+        trim: "trim",
+        body_type: "body_type",
+        drivetrain: "drivetrain",
+        std_seating: "std_seating",
+        highway_mpg: "highway_mpg",
+        city_mpg: "city_mpg",
     },
 
     marketcheck_vehicle_media_info: {

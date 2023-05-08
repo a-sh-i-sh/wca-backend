@@ -266,7 +266,7 @@ const getStaffById = async (req, res) => {
           // });
         }
         if (results.length) {
-          results[0].staff_id = EncryptedData(results[0].staff_id);
+          results[0].staff_id = req.body.staff_id;
         }
         const obj = {
           res,

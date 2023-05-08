@@ -31,6 +31,7 @@ const login = async (req, res) => {
   const emailID = req.body.email;
   await pool.query(sql, [emailID], async (err, result) => {
     if (err) {
+      console.log("madam ",err);
       send_sqlError(res)
     }
     if (result?.length === 0) {

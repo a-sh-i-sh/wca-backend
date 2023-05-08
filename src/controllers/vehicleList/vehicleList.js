@@ -21,6 +21,7 @@ const { send_sqlError, send_response } = require("../../config/reponseObject");
 const pool = require("../../connection/db");
 const Blackbook = require("../../middlewares/Blackbook/Blackbook");
 const MarketCheckUsedCar = require("../../middlewares/Marketcheck/UsedCarPrice");
+const VinDecoder = require("../../middlewares/Marketcheck/VinDecoder");
 const VehicleDetail = require("../../middlewares/NHTSA/VehicleDetail");
 
 const buildMarketcheckData = (vin) => {
@@ -52,10 +53,10 @@ const mediaMarketcheckData = (vin, type) => {
 
 const marketCheckAllData = (vin) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM ${marketcheck_vehicle_info?.tablename} t1 inner join
-    ${marketcheck_vehicle_dealer_info?.tablename} t2 on t1.vin=t2.vin inner join 
-    ${marketcheck_vehicle_build_info?.tablename} t3 on t2.vin=t3.vin
-    WHERE t1.vin = ?`;
+    const sql = `SELECT * FROM ${marketcheck_vehicle_info.tablename} t1 
+            RIGHT JOIN ${marketcheck_vehicle_dealer_info.tablename} t2 ON t1.vin = t2.vin 
+            RIGHT JOIN ${marketcheck_vehicle_build_info.tablename} t3 ON t1.vin = t3.vin 
+            WHERE t3.vin = ? `
     pool.query(sql, [vin], (err, result) => {
       if (err) {
         console.log("vehicle marketALL data", err);
@@ -71,16 +72,14 @@ const AddVehicles = async (req, res, next) => {
     try {
       const created_on = new Date();
 
-      const data = await buildMarketcheckData(req.body.vin);
+      let data = await buildMarketcheckData(req.body.vin);
+      console.log("here ",data)
       if (data?.length === 0) {
        //call api for getting particular vin detials : vin decoder || MarketCheckUsedCar(res,vin,miles)
-        const obj = {
-          res,
-          status: false,
-          code: NOT_FOUND,
-          errors: ["This vin number doesn't exist."],
-        };
-        return send_response(obj);
+       await VinDecoder(res,req.body.vin);
+       console.log("vindecoder ended: ")
+       data = await buildMarketcheckData(req.body.vin);
+       console.log("build after vind. ended: ",data)
       }
       const keys = ["vin", "make", "year", "model", "createdOn"];
       const values = [
@@ -121,6 +120,7 @@ const AddVehicles = async (req, res, next) => {
         }
       });
     } catch (err) {
+      console.log("add vehicle",err)
       const obj = {
         res,
         status: false,
@@ -236,7 +236,7 @@ const getVehiclesById = async (req, res) => {
       }
 
       if (result.length) {
-        result[0].vehicles_id = EncryptedData(result[0].vehicles_id);
+        result[0].vehicles_id = req.body.vehicles_id;
       }
       let MarketcheckArray = await marketCheckAllData(result[0]?.vin);
       let MarketcheckData = MarketcheckArray[0];

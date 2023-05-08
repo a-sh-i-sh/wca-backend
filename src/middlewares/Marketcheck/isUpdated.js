@@ -13,6 +13,7 @@ const {
   UpdateSearchCarsData,
 } = require("../../controllers/MarketCheck/UpdateSearchBycondition");
 const SearchByCondition = require("./SearchByCondition");
+const { send_sqlError } = require("../../config/reponseObject");
 
 const CheckVin_Insert_Update = async (vin) => {
   return new Promise((resolve, reject) => {
@@ -61,9 +62,13 @@ const isUpdated = async (req, res, next) => {
           dealer: {
             vin: result?.vin ? result?.vin : "",
             dealer_id: result?.dealer?.id ? result?.dealer?.id : "",
+            name: result?.dealer?.name ? result?.dealer?.name : "",
             city: result?.dealer?.city ? result?.dealer?.city : "",
             state: result?.dealer?.state ? result?.dealer?.state : "",
             country: result?.dealer?.country ? result?.dealer?.country : "",
+            zip: result?.dealer?.zip ? result?.dealer?.zip : "",
+            phone: result?.dealer?.phone ? result?.dealer?.phone : "",
+            seller_email: result?.dealer?.seller_email ? result?.dealer?.seller_email : "",
           },
           build: {
             vin: result?.vin ? result?.vin : "",
@@ -74,13 +79,22 @@ const isUpdated = async (req, res, next) => {
             doors: result?.build?.doors ? result?.build?.doors : "",
             cylinders: result?.build?.cylinders ? result?.build?.cylinders : "",
             engine: result?.build?.engine ? result?.build?.engine : "",
+            transmission: result?.build?.transmission ? result?.build?.transmission : "",
+            trim: result?.build?.trim ? result?.build?.trim : "",
+            body_type: result?.build?.body_type ? result?.build?.body_type : "",
+            drivetrain: result?.build?.drivetrain ? result?.build?.drivetrain : "",
+            std_seating: result?.build?.std_seating ? result?.build?.std_seating : "",
+            highway_mpg: result?.build?.highway_mpg ? result?.build?.highway_mpg : "",
+            city_mpg: result?.build?.city_mpg ? result?.build?.city_mpg : "",
           },
         };
 
         const existVin = await CheckVin_Insert_Update(result?.vin);
         if (existVin.length === 0) {
+          console.log("going to insert")
           await InsertSearchCarsData(req, res, data);
         } else {
+          console.log("going to update")
           await UpdateSearchCarsData(req, res, data);
         }
       })
@@ -91,6 +105,7 @@ const isUpdated = async (req, res, next) => {
     //   }
   } catch (err) {
     console.log("isUPdated page", err);
+    return send_sqlError(res)
   }
 };
 
