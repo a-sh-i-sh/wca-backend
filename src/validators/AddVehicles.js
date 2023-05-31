@@ -5,8 +5,10 @@ const { send_response } = require("../config/reponseObject");
 const AddVehiclesValidation = async (req, res, next) => {
 
   const schema = Joi.object({
-    vehicles_id: Joi.string().allow(null, ""),
+    vehicles_id: Joi.string().allow(""),
     vin: Joi.string().required(),
+    miles: Joi.number().allow(null, ""),
+    purchase_price: Joi.number().allow(""),
     createdOn: Joi.date().allow(null, ""),
   });
 

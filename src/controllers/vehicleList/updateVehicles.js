@@ -22,21 +22,26 @@ const updateVehicles = async (req, res) => {
     try {
       const created_on = new Date();
       const data = await buildMarketcheckData(req.body.vin);
-      if(data?.length === 0){
+      if (data?.length === 0) {
         const obj = {
           res,
           status: false,
           code: NOT_FOUND,
-          errors: ["This vin number doesn't exist"]
-        }
+          errors: ["This vin number doesn't exist"],
+        };
         return send_response(obj);
       }
 
-      const sql = `update wca_negotiating_vehicles set make=?,year=?,model=?,createdOn=?,is_deleted=? where vin=? AND vehicles_id=?`;
-      const sqlValues = [
+      let sql = `update wca_negotiating_vehicles set make=?,year=?,model=?,base=?,miles=?,trade_price=?,base_int_color=?,base_ext_color=?,createdOn=?,is_deleted=? where vin=? AND vehicles_id=?`;
+      let sqlValues = [
         data[0].make,
         data[0].year,
         data[0].model,
+        data[0].miles,
+        data[0].miles,
+        data[0].trade_price,
+        data[0].base_int_color,
+        data[0].base_ext_color,
         created_on,
         0,
         req.body.vin,
@@ -82,36 +87,36 @@ const updateVehicles = async (req, res) => {
   } else {
     // please update the other data of vin (Whose is_deleted is 0)
     try {
-      // const MData = MarketCheckUsedCar(req.body.vin, Number(req.body.miles));
-      // const MData = {make: "GMC", year: "2008", model:"sierra 1550", miles: Number(req.body.miles), trade_price: 1700}
-      // if (MData === 400) {
-      //   const obj = {
-      //     res,
-      //     status: true,
-      //     code: BAD_REQUEST,
-      //     errors: ["Uable to fetch data from MarketChek api"],
-      //   };
-      //   return send_response(obj);
-      // }
-      const data = await buildMarketcheckData(req.body.vin);
-      if(data?.length === 0){
-        const obj = {
-          res,
-          status: false,
-          code: NOT_FOUND,
-          errors: ["This vin number doesn't exist"]
+      if (req.body.miles !== undefined && req.body.miles !== "") {
+        const MData = await MarketCheckUsedCar(req.body.vin, Number(req.body.miles));
+        if (MData === 400) {
+          const obj = {
+            res,
+            status: true,
+            code: BAD_REQUEST,
+            errors: ["Unable to fetch data from MarketChek api"],
+          };
+          return send_response(obj);
         }
-        return send_response(obj);
-      }
-      
-      const sql = `update wca_negotiating_vehicles set make=?,year=?,model=? where vehicles_id=?`;
-      const sqlValues = [
-        data[0].make,
-        data[0].year,
-        data[0].model,
+        sql = `update wca_negotiating_vehicles set make=?,year=?,model=?,miles=?,trade_price=?,base_int_color=?,base_ext_color=?,purchase_price=? where vehicles_id=?`;
+        sqlValues = [
+          MData.make,
+          MData.year,
+          MData.model,
+          MData.miles,
+          MData.trade_price,
+          MData.base_int_color,
+          MData.base_ext_color,
+          req.body.purchase_price,
+          req.body.vehicles_id,
+        ];
+      } else {
+      sql = `update wca_negotiating_vehicles set purchase_price=? where vehicles_id=?`;
+      sqlValues = [
+        req.body.purchase_price,
         req.body.vehicles_id,
       ];
-
+    }
       await pool.query(sql, sqlValues, (err, result) => {
         if (err) {
           return send_sqlError(res);
