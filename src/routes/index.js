@@ -35,7 +35,11 @@ const identifyID = require("../middlewares/ID_Identifier/id_identifier");
 const { EncryptedData } = require("../config/encrypt_decrypt");
 const updateVehicles = require("../controllers/vehicleList/updateVehicles");
 const isUpdated = require("../middlewares/Marketcheck/isUpdated");
+<<<<<<< HEAD
 const { upload, imageValidation } = require("../controllers/vehicleList/vehicleImages");
+=======
+const {upload, imageValidation} = require("../controllers/vehicleList/vehicleImages");
+>>>>>>> 6a2ad238282c031cbc0a7df9176aad460f603c9b
 // const VehicleDetail = require("../middlewares/NHTSA/VehicleDetail");
 
 router.post("/auth/login", loginValidation, login);
