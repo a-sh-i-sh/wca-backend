@@ -26,7 +26,16 @@ const VehicleDetail = require("../../middlewares/NHTSA/VehicleDetail");
 
 const buildMarketcheckData = (vin) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT ${marketcheck_vehicle_build_info?.make},${marketcheck_vehicle_build_info?.year},${marketcheck_vehicle_build_info?.model} FROM ${marketcheck_vehicle_build_info?.tablename} WHERE vin = ?`;
+    const sql = `SELECT ${marketcheck_vehicle_info.miles},
+    ${marketcheck_vehicle_info.trade_price},
+    ${marketcheck_vehicle_info.base_int_color},
+    ${marketcheck_vehicle_info.base_ext_color},
+    ${marketcheck_vehicle_build_info?.make},
+    ${marketcheck_vehicle_build_info?.year},
+    ${marketcheck_vehicle_build_info?.model} 
+    FROM ${marketcheck_vehicle_info.tablename} t1
+    RIGHT JOIN ${marketcheck_vehicle_build_info.tablename} t2 ON t1.vin = t2.vin
+    WHERE t2.vin = ?`;
     pool.query(sql, [vin], (err, result) => {
       if (err) {
         console.log("vehicle market build DATA", err);
@@ -73,20 +82,31 @@ const AddVehicles = async (req, res, next) => {
       const created_on = new Date();
 
       let data = await buildMarketcheckData(req.body.vin);
-      console.log("here ",data)
       if (data?.length === 0) {
-       //call api for getting particular vin detials : vin decoder || MarketCheckUsedCar(res,vin,miles)
-       await VinDecoder(res,req.body.vin);
-       console.log("vindecoder ended: ")
-       data = await buildMarketcheckData(req.body.vin);
-       console.log("build after vind. ended: ",data)
+      //  await VinDecoder(res,req.body.vin);
+      //  console.log("vindecoder ended: ")
+      //  data = await buildMarketcheckData(req.body.vin);
+      //  console.log("build after vind. ended: ",data)
+      const obj = {
+        res,
+        status: false,
+        code: NOT_FOUND,
+        errors: ["This vin number doesn't exist"],
+      };
+      return send_response(obj);
       }
-      const keys = ["vin", "make", "year", "model", "createdOn"];
+      
+      const keys = ["vin", "make", "year", "model", "base", "miles", "trade_price", "base_int_color", "base_ext_color", "createdOn"];
       const values = [
         req.body.vin,
         data[0].make,
         data[0].year,
         data[0].model,
+        data[0].miles,
+        data[0].miles,
+        data[0].trade_price,
+        data[0].base_int_color,
+        data[0].base_ext_color, 
         created_on,
       ];
       const sql = `INSERT INTO wca_negotiating_vehicles (${keys}) VALUES (?)`;
@@ -141,7 +161,10 @@ const getAll = (search) => {
     OR make LIKE '%${search}%'
     OR year LIKE '%${search}%'
     OR model LIKE '%${search}%'
+    OR miles LIKE '%${search}%'
     OR trade_price LIKE '%${search}%'
+    OR base_int_color LIKE '%${search}%'
+    OR base_ext_color LIKE '%${search}%'
     OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' )`;
     pool.query(sql, (err, result) => {
       if (err) {
@@ -167,13 +190,16 @@ const getVehiclesList = async (req, res) => {
         ? Math.trunc(total_records / limit)
         : Math.trunc(total_records / limit) + 1;
 
-    const sql = `SELECT vehicles_id,vin,make,year,model,trade_price,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p')
+    const sql = `SELECT vehicles_id,vin,make,year,model,miles,trade_price,base_int_color,base_ext_color,DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p')
       AS created_on FROM wca_negotiating_vehicles WHERE is_deleted = 0
   AND ( vin LIKE '%${search}%'
   OR make LIKE '%${search}%'
   OR year LIKE '%${search}%'
   OR model LIKE '%${search}%'
+  OR miles LIKE '%${search}%'
   OR trade_price LIKE '%${search}%'
+  OR base_int_color LIKE '%${search}%'
+  OR base_ext_color LIKE '%${search}%'
   OR DATE_FORMAT(createdOn,'%d/%m/%Y %h:%i %p') LIKE '%${search}%' )
   ORDER BY ${sortColumn} ${sort}
   LIMIT ${skip},${limit}`;
@@ -223,7 +249,7 @@ const getVehiclesList = async (req, res) => {
 
 const getVehiclesById = async (req, res) => {
   try {
-    const sql = `Select vehicles_id,vin,trade_price FROM wca_negotiating_vehicles WHERE is_deleted = 0 AND vehicles_id = ?`;
+    const sql = `Select vehicles_id,vin,make,year,model,base,miles,trade_price,base_int_color,base_ext_color,purchase_price FROM wca_negotiating_vehicles WHERE is_deleted = 0 AND vehicles_id = ?`;
     await pool.query(sql, [req.body.vehicles_id], async (err, result) => {
       if (err) {
         return send_sqlError(res);
@@ -237,11 +263,11 @@ const getVehiclesById = async (req, res) => {
 
       if (result.length) {
         result[0].vehicles_id = req.body.vehicles_id;
-      }
+      } 
       let MarketcheckArray = await marketCheckAllData(result[0]?.vin);
       let MarketcheckData = MarketcheckArray[0];
       if (MarketcheckData?.id || MarketcheckData?.vehicle_id) {
-        ["id", "vehicle_id"].forEach((e) => delete MarketcheckData[e]);
+        ["id","vehicle_id","vin","make","year","model","miles","trade_price","base_int_color","base_ext_color"].forEach((e) => delete MarketcheckData[e]);
       }
       Object.assign(result[0], MarketcheckData);
 
@@ -250,7 +276,11 @@ const getVehiclesById = async (req, res) => {
      MarketcheckArray.map((item,ind) => {
       item.image_url = decodeURIComponent(item.image_url)
      })
+
+    //  CarsImagesArray = await 
+     
      Object.assign(result[0], {photo_links: MarketcheckArray})
+
      MarketcheckArray = await mediaMarketcheckData(result[0]?.vin,2);
      MarketcheckArray.map((item,ind) => {
       item.image_url = decodeURIComponent(item.image_url)

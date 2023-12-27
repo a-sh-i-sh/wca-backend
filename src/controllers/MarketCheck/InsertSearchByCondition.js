@@ -73,53 +73,51 @@ const InsertSearchCarsData = async (req, res, data) => {
     //   }
     // })
 
-  let keys = Object.keys(marketcheck_vehicle_build_info).slice(
-      2,
-      Object.keys(marketcheck_vehicle_build_info).length
-    );
-  let values = Object.values(buildData);
-    // Sanitize the input values to prevent SQL injection attacks
-  let sanitizedValues = values.map((val) =>
-      typeof val === "string" ? `'${val.replace(/'/g, "''")}'` : val
-    );
+  //  keys = Object.keys(marketcheck_vehicle_build_info).slice(
+  //     2,
+  //     Object.keys(marketcheck_vehicle_build_info).length
+  //   );
+  //  values = Object.values(buildData);
+  //   // Sanitize the input values to prevent SQL injection attacks
+  //  sanitizedValues = values.map((val) =>
+  //     typeof val === "string" ? `'${val.replace(/'/g, "''")}'` : val
+  //   );
 
-  let sql = `INSERT INTO ${marketcheck_vehicle_build_info?.tablename} (${keys.map(
-      (key) => `\`${key}\``
-    )}) VALUES (${sanitizedValues})`;
+  //  sql = `INSERT INTO ${marketcheck_vehicle_build_info?.tablename} (${keys.map(
+  //     (key) => `\`${key}\``
+  //   )}) VALUES (${sanitizedValues})`;
 
-    await pool.query(sql, (err, result) => {
-      if (err) {
-        console.log("listsearch vbi page", err);
-        return send_sqlError(res);
-      }
-    })
+  //   await pool.query(sql, (err, result) => {
+  //     if (err) {
+  //       console.log("listsearch vbi page", err);
+  //       return send_sqlError(res);
+  //     }
+  //   })
 
-    // keys = ["vin", "photo_link", "type"].join(",");
-    // data?.media?.photo_links?.slice(0,3)?.map(async (item, index) => {
-    //   values = [data?.vin, encodeURIComponent(item), 1]
-    //     .map((val) => (typeof val === "string" ? `'${val}'` : val))
-    //     .join(",");
-    //   sql = `INSERT INTO ${marketcheck_vehicle_media_info?.tablename} (${keys}) VALUES (${values})`;
-    //   await pool.query(sql, (err, result) => {
-    //     if (err) {
-    //       console.log("listsearch vImage1 page", err);
-    //       return send_sqlError(res);
-    //     }
-    //   })
-    // });
+    let keys = ["vin", "photo_link", "type"].join(",");
+    let img = (data?.media?.photo_links?.length > 3) ? 3 : data?.media?.photo_links?.length;
 
-    // data?.media?.photo_links_cached?.slice(0,3)?.map(async (item, index) => {
-    //   values = [data?.vin, encodeURIComponent(item), 2]
-    //     .map((val) => (typeof val === "string" ? `'${val}'` : val))
-    //     .join(",");
-    //   sql = `INSERT INTO ${marketcheck_vehicle_media_info?.tablename} (${keys}) VALUES (${values})`;
-    //   await pool.query(sql, (err, result) => {
-    //     if (err) {
-    //       console.log("listsearch vImage2 page", err);
-    //       return send_sqlError(res);
-    //     }
-    //   })
-    // });
+    for (let index = 0; index < img; index++) {
+      const item = data?.media?.photo_links[index];
+    const values = [data?.vin, encodeURIComponent(item), 1]
+        .map((val) => (typeof val === "string" ? `'${val}'` : val))
+        .join(",");
+    const sql = `INSERT INTO ${marketcheck_vehicle_media_info?.tablename} (${keys}) VALUES (${values})`;
+      await QueryForUpdate(sql);
+      console.log("end of insertion photos")
+    }
+
+
+    img = (data?.media?.photo_links_cached?.length > 3) ? 3 : data?.media?.photo_links_cached?.length;
+      for (let index = 0; index < img; index++) {
+        const item = data?.media?.photo_links_cached[index];
+      const values = [data?.vin, encodeURIComponent(item), 2]
+        .map((val) => (typeof val === "string" ? `'${val}'` : val))
+        .join(",");
+      const sql = `INSERT INTO ${marketcheck_vehicle_media_info?.tablename} (${keys}) VALUES (${values})`;
+      await QueryForUpdate(sql);
+      console.log("end of insertion cached")
+    }
 
     return;
   } catch (err) {

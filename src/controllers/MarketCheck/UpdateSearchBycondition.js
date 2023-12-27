@@ -38,21 +38,27 @@ const UpdateSearchCarsData = async (req, res, data) => {
 
     // // Combine the keys and values into the query string
     // let sql = `UPDATE ${marketcheck_vehicle_info?.tablename} SET ${keys} WHERE vin = '${data?.vin}'`;
-    // await QueryForUpdate(sql,values);
+    // let p1 = await QueryForUpdate(sql,values);
 
 
-   let keys = Object.keys(marketcheck_vehicle_dealer_info).slice(
-      3,
-      Object.keys(marketcheck_vehicle_dealer_info).length
-    );
-    keys = keys.map((key, ind) => {
-      return (key += ` = ?`);
-    });
-   let values = Object.values(dealerData).slice(1, Object.values(dealerData)?.length);
 
-   let sql = `UPDATE ${marketcheck_vehicle_dealer_info?.tablename} SET ${keys} WHERE vin = '${data?.vin}'`;
-     await QueryForUpdate(sql, values);
+
+    // keys = Object.keys(marketcheck_vehicle_dealer_info).slice(
+    //   3,
+    //   Object.keys(marketcheck_vehicle_dealer_info).length
+    // );
+    // keys = keys.map((key, ind) => {
+    //   return (key += ` = ?`);
+    // });
+    // values = Object.values(dealerData).slice(1, Object.values(dealerData)?.length);
+
+    // sql = `UPDATE ${marketcheck_vehicle_dealer_info?.tablename} SET ${keys} WHERE vin = '${data?.vin}'`;
+    //  let p2 = await QueryForUpdate(sql, values);
       
+
+
+
+
     // keys = Object.keys(marketcheck_vehicle_build_info).slice(
     //   3,
     //   Object.keys(marketcheck_vehicle_build_info).length
@@ -63,41 +69,37 @@ const UpdateSearchCarsData = async (req, res, data) => {
     // values = Object.values(buildData).slice(1, Object.values(buildData)?.length);
 
     // sql = `UPDATE ${marketcheck_vehicle_build_info?.tablename} SET ${keys} WHERE vin = '${data?.vin}'`;
+    // let p3 = await QueryForUpdate(sql,values);
 
-    // await QueryForUpdate(sql,values);
+
 
     console.log("hello 48.....................");
-    // keys = ["vin", "photo_link", "type"].map(key => `${key} = ?`).join(",");
 
-    // data?.media?.photo_links?.slice(0,3)?.map(async (item, index) => {
-    //   let mediaValues = [encodeURIComponent(item), data?.vin];
-    //   sql = `UPDATE ${marketcheck_vehicle_media_info?.tablename} SET photo_link=?,type=1  WHERE vin=?`;
-    //   console.log("ram index: ", index);
-    //   await QueryForUpdate(sql, mediaValues);     
 
-    //     pool.query(sql, mediaValues, async (err, result) => {
-    //       if (err) {
-    //         console.log("update vImage1 page", err);
-    //         return send_sqlError(res);
-    //       }
-    //     })
-    // })
+      let img = (data?.media?.photo_links?.length > 3) ? 3 : data?.media?.photo_links?.length;
 
-    // data?.media?.photo_links_cached?.slice(0,3)?.map(async (item, index) => {
-    //   let cachedValues = [encodeURIComponent(item), data?.vin];
-    //   sql = `UPDATE ${marketcheck_vehicle_media_info?.tablename} SET photo_link=?,type=2 WHERE vin=?`;
-    //   console.log("cached index: ", index);
-    //   await QueryForUpdate(sql, cachedValues);
-    
-    //     pool.query(sql, cachedValues, async (err, result) => {
-    //       if (err) {
-    //         console.log("update vImage2 page", err);
-    //         return send_sqlError(res);
-    //       }
-    //     })
-    // })
+      for (let index = 0; index < img; index++) {
+        const item = data?.media?.photo_links[index];
+      let mediaValues = [encodeURIComponent(item), data?.vin];
+      sql = `UPDATE ${marketcheck_vehicle_media_info?.tablename} SET photo_link=?,type=1  WHERE vin=?`;
+      console.log("ram index: ", index);
+      await QueryForUpdate(sql, mediaValues);     
+      console.log("end of photo links")
+    }
+
+      img = (data?.media?.photo_links_cached?.length > 3) ? 3 : data?.media?.photo_links_cached?.length;
+      
+      for (let index = 0; index < img; index++) {
+        const item = data?.media?.photo_links_cached[index];
+      let cachedValues = [encodeURIComponent(item), data?.vin];
+      sql = `UPDATE ${marketcheck_vehicle_media_info?.tablename} SET photo_link=?,type=2 WHERE vin=?`;
+      console.log("cached index: ", index);
+      await QueryForUpdate(sql, cachedValues);
+      console.log("end of Cached links")
+    }
 
     return;
+
   // } catch (err) {
   //   console.log("updatesearch ",err);
   //   const obj = {

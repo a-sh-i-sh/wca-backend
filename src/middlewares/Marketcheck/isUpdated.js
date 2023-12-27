@@ -5,19 +5,15 @@
 // 5) Based on existance of vin, data of marketcheck will update or insert.
 
 const pool = require("../../connection/db");
-const { marketcheck_vehicle_info } = require("../../config/constTablesStruct");
-const {
-  InsertSearchCarsData,
-} = require("../../controllers/MarketCheck/InsertSearchByCondition");
-const {
-  UpdateSearchCarsData,
-} = require("../../controllers/MarketCheck/UpdateSearchBycondition");
+const { marketcheck_vehicle_info, marketcheck_vehicle_media_info } = require("../../config/constTablesStruct");
+const { InsertSearchCarsData } = require("../../controllers/MarketCheck/InsertSearchByCondition");
+const { UpdateSearchCarsData } = require("../../controllers/MarketCheck/UpdateSearchBycondition");
 const SearchByCondition = require("./SearchByCondition");
 const { send_sqlError } = require("../../config/reponseObject");
 
 const CheckVin_Insert_Update = async (vin) => {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT ${marketcheck_vehicle_info?.id},${marketcheck_vehicle_info?.vin} FROM ${marketcheck_vehicle_info?.tablename} WHERE vin = ?`;
+    const sql = `SELECT ${marketcheck_vehicle_info?.id},${marketcheck_vehicle_info?.vin} FROM ${marketcheck_vehicle_media_info?.tablename} WHERE vin = ?`;
     pool.query(sql, [vin], (err, result) => {
       if (err) {
         console.log("vehicle market build DATA", err);
@@ -44,14 +40,16 @@ const isUpdated = async (req, res, next) => {
       rows
     );
 
-    await Promise.all(
-      APIDATA?.listings?.map(async (result, index) => {
+
+        for(let index = 0; index < APIDATA?.listings?.length; index++) {
+          const result = APIDATA?.listings[index];
         let data = {
           vin: result?.vin ? result?.vin : "",
           vehicle_id: result?.id ? result?.id : "",
           heading: result?.heading ? result?.heading : "",
-          miles: result?.miles ? result?.miles : "",
-          target_retail: result?.msrp ? result?.msrp : "",
+          miles: result?.miles ? result?.miles : 0,
+          trade_price: result?.price ? result?.price : 0.00,
+          target_retail: result?.msrp ? result?.msrp : 0.00,
           ext_color: result?.exterior_color ? result?.exterior_color : "",
           int_color: result?.interior_color ? result?.interior_color : "",
           base_ext_color: result?.base_ext_color ? result?.base_ext_color : "",
@@ -76,8 +74,8 @@ const isUpdated = async (req, res, next) => {
             make: result?.build?.make ? result?.build?.make : "",
             model: result?.build?.model ? result?.build?.model : "",
             fuel_type: result?.build?.fuel_type ? result?.build?.fuel_type : "",
-            doors: result?.build?.doors ? result?.build?.doors : "",
-            cylinders: result?.build?.cylinders ? result?.build?.cylinders : "",
+            doors: result?.build?.doors ? result?.build?.doors : 0,
+            cylinders: result?.build?.cylinders ? result?.build?.cylinders : 0,
             engine: result?.build?.engine ? result?.build?.engine : "",
             transmission: result?.build?.transmission ? result?.build?.transmission : "",
             trim: result?.build?.trim ? result?.build?.trim : "",
@@ -90,6 +88,7 @@ const isUpdated = async (req, res, next) => {
         };
 
         const existVin = await CheckVin_Insert_Update(result?.vin);
+        console.log("End of check exiting vin")
         if (existVin.length === 0) {
           console.log("going to insert")
           await InsertSearchCarsData(req, res, data);
@@ -97,8 +96,8 @@ const isUpdated = async (req, res, next) => {
           console.log("going to update")
           await UpdateSearchCarsData(req, res, data);
         }
-      })
-    );
+      }
+    console.log("end of complete insertion/updation")
     next();
     //   } else {
     //     next();
